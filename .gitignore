@@ -1,0 +1,10 @@
+/target
+/target-dev
+*.in-use-*.exe
+*.log
+*.tmp
+*.corrupt
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

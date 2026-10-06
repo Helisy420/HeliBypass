@@ -1,0 +1,571 @@
+import { Theme } from "../theme.slint";
+import { Card, Pill, Btn, Icon, Eyebrow, PageHeader, Field, Segmented, Toggle, ProgressBar, Scroller } from "../components.slint";
+import { AppState } from "../state.slint";
+import { Icons } from "../icons.slint";
+
+component Beta inherits Rectangle {
+    width: 44px;
+    height: 20px;
+    border-radius: 10px;
+    background: Theme.amber.with-alpha(0.14);
+    border-width: 1px;
+    border-color: Theme.amber.with-alpha(0.45);
+    Text {
+        width: parent.width;
+        height: parent.height;
+        text: "BETA";
+        color: Theme.amber;
+        font-size: 9.5px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
+
+component Label inherits Text {
+    color: Theme.muted;
+    font-size: 12px;
+}
+
+component Hint inherits Text {
+    color: Theme.dim;
+    font-size: 11.5px;
+    wrap: word-wrap;
+}
+
+// A label above a control.
+component Labeled inherits VerticalLayout {
+    in property <string> label;
+    spacing: 6px;
+    Label { text: root.label; }
+    @children
+}
+
+// ── smart selection ──
+component SmartCard inherits Card {
+    VerticalLayout {
+        padding: 20px;
+        spacing: 12px;
+        HorizontalLayout {
+            spacing: 10px;
+            Eyebrow {
+                text: @tr("Smart selection");
+                height: 20px;
+                horizontal-stretch: 1;
+            }
+            Beta { }
+        }
+        Text {
+            text: AppState.build-base != "" ? @tr("Builds “customhelibypass” for your connection, starting from “{}”.", AppState.build-base) : @tr("Select a strategy to start from.");
+            color: Theme.text;
+            font-size: 14px;
+            font-weight: 600;
+            wrap: word-wrap;
+        }
+        Hint {
+            text: @tr("Stage 1 screens the web settings of every upstream strategy. Stage 2 takes the three best and tries variations of them with every check: long downloads (the 16-20 KB freeze), Discord's gateway held open with heartbeats, its voice servers and media ports, and your own services. Stage 3 tests the two best again so luck does not decide. When results tie, the gentler strategy wins: fewer fake packets and less fragmentation keep long connections stable and draw less attention from the censor. Takes 5-10 minutes; the bypass pauses meanwhile.");
+        }
+        if AppState.smart-running: VerticalLayout {
+            spacing: 8px;
+            HorizontalLayout {
+                Text {
+                    horizontal-stretch: 1;
+                    text: AppState.test-label;
+                    color: Theme.text;
+                    font-size: 12.5px;
+                    overflow: elide;
+                }
+                Text {
+                    text: AppState.test-count;
+                    color: Theme.muted;
+                    font-size: 12px;
+                    font-family: Theme.mono;
+                }
+            }
+            ProgressBar { value: AppState.test-progress; }
+        }
+        if AppState.build-note != "": Text {
+            text: AppState.build-note;
+            color: Theme.success;
+            font-size: 12.5px;
+            wrap: word-wrap;
+        }
+        if AppState.test-error != "": Text {
+            text: AppState.test-error;
+            color: Theme.danger;
+            font-size: 12px;
+            wrap: word-wrap;
+        }
+        HorizontalLayout {
+            spacing: 10px;
+            alignment: start;
+            Btn {
+                height: 40px;
+                font-size: 13px;
+                text: @tr("Start smart selection");
+                icon: Icons.zap;
+                enabled: !AppState.test-running;
+                clicked => { AppState.studio-smart(); }
+            }
+            if AppState.smart-running: Btn {
+                kind: 1;
+                height: 40px;
+                font-size: 13px;
+                text: @tr("Stop");
+                icon: Icons.x;
+                clicked => { AppState.tests-stop(); }
+            }
+            if AppState.test-best == "customhelibypass" && !AppState.smart-running: Btn {
+                kind: 1;
+                height: 40px;
+                font-size: 13px;
+                text: @tr("Use customhelibypass");
+                icon: Icons.check;
+                clicked => { AppState.tests-use-best(); }
+            }
+            Btn {
+                kind: 3;
+                height: 40px;
+                font-size: 13px;
+                text: @tr("Show results");
+                icon: Icons.list;
+                clicked => { AppState.page = 3; }
+            }
+        }
+    }
+}
+
+// ── build your own ──
+component ManualCard inherits Card {
+    VerticalLayout {
+        padding: 20px;
+        spacing: 14px;
+        HorizontalLayout {
+            spacing: 10px;
+            Eyebrow {
+                text: @tr("Build your own");
+                height: 20px;
+                horizontal-stretch: 1;
+            }
+            Beta { }
+        }
+        Hint {
+            text: @tr("Settings for ordinary web traffic (HTTP and HTTPS), plus QUIC and Discord voice. Everything else comes from “{}”.", AppState.studio-base);
+        }
+        Labeled {
+            label: @tr("Technique");
+            Segmented {
+                labels: ["multisplit", "fakedsplit", "multidisorder", "hostfakesplit"];
+                current <=> AppState.studio-tech;
+                selected(i) => { AppState.studio-changed(); }
+            }
+        }
+        HorizontalLayout {
+            spacing: 14px;
+            HorizontalLayout {
+                horizontal-stretch: 1;
+                spacing: 10px;
+                VerticalLayout {
+                    alignment: center;
+                    Toggle {
+                        checked: AppState.studio-fake;
+                        toggled(v) => {
+                            AppState.studio-fake = v;
+                            AppState.studio-changed();
+                        }
+                    }
+                }
+                VerticalLayout {
+                    alignment: center;
+                    spacing: 2px;
+                    Text {
+                        text: @tr("Add fake packets");
+                        color: Theme.text;
+                        font-size: 13px;
+                    }
+                    Hint { text: @tr("A decoy ClientHello before the real one."); }
+                }
+            }
+            Labeled {
+                width: 150px;
+                label: @tr("Fake repeats");
+                Field {
+                    text <=> AppState.studio-repeats;
+                    mono: true;
+                    read-only: !AppState.studio-fake;
+                    opacity: AppState.studio-fake ? 1 : 0.45;
+                    edited => { AppState.studio-changed(); }
+                }
+            }
+        }
+        if AppState.studio-tech != 3: HorizontalLayout {
+            spacing: 14px;
+            Labeled {
+                horizontal-stretch: 1;
+                label: @tr("Split position");
+                Field {
+                    text <=> AppState.studio-pos;
+                    mono: true;
+                    placeholder: "1, 2, sniext+1, midsld";
+                    edited => { AppState.studio-changed(); }
+                }
+            }
+            Labeled {
+                horizontal-stretch: 1;
+                label: @tr("Overlap, bytes (0 = off)");
+                Field {
+                    text <=> AppState.studio-seqovl;
+                    mono: true;
+                    read-only: AppState.studio-tech != 0;
+                    opacity: AppState.studio-tech == 0 ? 1 : 0.45;
+                    edited => { AppState.studio-changed(); }
+                }
+            }
+        }
+        if AppState.studio-tech == 3: Labeled {
+            label: @tr("Host shown in the fake part");
+            Field {
+                text <=> AppState.studio-host;
+                mono: true;
+                placeholder: "www.google.com";
+                edited => { AppState.studio-changed(); }
+            }
+        }
+        Labeled {
+            label: @tr("Fooling (how the fakes are made invisible to the server)");
+            Segmented {
+                labels: [@tr("none"), "ts", "md5sig", "badseq"];
+                current <=> AppState.studio-fooling;
+                selected(i) => { AppState.studio-changed(); }
+            }
+        }
+        Labeled {
+            label: @tr("Fake ClientHello and overlap pattern");
+            Segmented {
+                labels: ["google", "4pda", "max.ru", "sochi", "5ka"];
+                current <=> AppState.studio-file;
+                selected(i) => { AppState.studio-changed(); }
+            }
+        }
+        HorizontalLayout {
+            spacing: 14px;
+            Labeled {
+                horizontal-stretch: 1;
+                label: @tr("QUIC fake repeats");
+                Field {
+                    text <=> AppState.studio-quic;
+                    mono: true;
+                    placeholder: @tr("keep");
+                    edited => { AppState.studio-changed(); }
+                }
+            }
+            Labeled {
+                horizontal-stretch: 1;
+                label: @tr("Discord voice fake repeats");
+                Field {
+                    text <=> AppState.studio-voice;
+                    mono: true;
+                    placeholder: @tr("keep");
+                    edited => { AppState.studio-changed(); }
+                }
+            }
+        }
+        Rectangle {
+            border-radius: 10px;
+            background: Theme.bg;
+            border-width: 1px;
+            border-color: Theme.border;
+            VerticalLayout {
+                padding: 12px;
+                spacing: 4px;
+                Text {
+                    text: @tr("WEB PROFILE");
+                    color: Theme.dim;
+                    font-size: 10px;
+                    letter-spacing: 1px;
+                }
+                Text {
+                    text: AppState.studio-preview;
+                    color: Theme.muted;
+                    font-size: 11px;
+                    font-family: Theme.mono;
+                    wrap: word-wrap;
+                }
+            }
+        }
+        if AppState.studio-problems != "": Text {
+            text: AppState.studio-problems;
+            color: Theme.danger;
+            font-size: 12px;
+            wrap: word-wrap;
+        }
+        HorizontalLayout {
+            spacing: 10px;
+            alignment: start;
+            Btn {
+                kind: 1;
+                height: 40px;
+                font-size: 13px;
+                text: @tr("Load from selected");
+                icon: Icons.rotate;
+                clicked => { AppState.studio-load(); }
+            }
+            Btn {
+                kind: 1;
+                height: 40px;
+                font-size: 13px;
+                text: @tr("Test");
+                icon: Icons.flask;
+                enabled: !AppState.test-running && AppState.studio-problems == "";
+                clicked => { AppState.studio-test(); }
+            }
+            Btn {
+                height: 40px;
+                font-size: 13px;
+                text: @tr("Save as customhelibypass");
+                icon: Icons.check;
+                enabled: AppState.studio-problems == "";
+                clicked => { AppState.studio-save(); }
+            }
+        }
+    }
+}
+
+// ── services in the tests ──
+component ServicesCard inherits Card {
+    VerticalLayout {
+        padding: 20px;
+        spacing: 10px;
+        Eyebrow {
+            text: @tr("Your services in the tests");
+            height: 20px;
+        }
+        Hint {
+            text: @tr("Sites you care about, checked by every test next to Discord, YouTube and Cloudflare (the “Yours” column): a request plus a download of the address you enter.");
+        }
+        for svc[i] in AppState.services: Rectangle {
+            height: 40px;
+            border-radius: 9px;
+            background: Theme.bg.with-alpha(0.5);
+            HorizontalLayout {
+                padding-left: 12px;
+                padding-right: 6px;
+                spacing: 10px;
+                Text {
+                    width: 140px;
+                    text: svc.name;
+                    color: Theme.text;
+                    font-size: 12.5px;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+                Text {
+                    horizontal-stretch: 1;
+                    text: svc.url;
+                    color: Theme.dim;
+                    font-size: 11.5px;
+                    font-family: Theme.mono;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+                Rectangle {
+                    width: 30px;
+                    height: 30px;
+                    y: 5px;
+                    border-radius: 8px;
+                    background: rm.has-hover ? Theme.danger.with-alpha(0.16) : transparent;
+                    Icon {
+                        source: Icons.x;
+                        color: rm.has-hover ? Theme.danger : Theme.dim;
+                        size: 15px;
+                        x: 7.5px;
+                        y: 7.5px;
+                    }
+                    rm := TouchArea {
+                        mouse-cursor: pointer;
+                        clicked => { AppState.service-remove(i); }
+                    }
+                }
+            }
+        }
+        HorizontalLayout {
+            spacing: 10px;
+            Field {
+                width: 150px;
+                text <=> AppState.tsvc-name;
+                placeholder: @tr("Name");
+            }
+            Field {
+                horizontal-stretch: 1;
+                text <=> AppState.tsvc-url;
+                mono: true;
+                placeholder: "https://example.com/file";
+                accepted => { AppState.service-add(); }
+            }
+            Btn {
+                kind: 1;
+                height: 40px;
+                pad: 14px;
+                font-size: 13px;
+                text: @tr("Add");
+                icon: Icons.plus;
+                clicked => { AppState.service-add(); }
+            }
+        }
+        if AppState.tsvc-error != "": Text {
+            text: AppState.tsvc-error;
+            color: Theme.danger;
+            font-size: 12px;
+        }
+    }
+}
+
+// ── one click (the default view) ──
+component OneClickCard inherits Card {
+    VerticalLayout {
+        padding: 28px;
+        spacing: 16px;
+        alignment: center;
+        HorizontalLayout {
+            alignment: center;
+            Rectangle {
+                width: 64px;
+                height: 64px;
+                border-radius: 32px;
+                background: Theme.accent.with-alpha(0.14);
+                border-width: 1.5px;
+                border-color: Theme.amber.with-alpha(0.65);
+                Icon {
+                    source: Icons.sparkles;
+                    color: Theme.accent;
+                    size: 28px;
+                    x: 18px;
+                    y: 18px;
+                }
+            }
+        }
+        Text {
+            text: @tr("Set up the bypass in one click");
+            color: Theme.text;
+            font-size: 20px;
+            font-weight: 600;
+            horizontal-alignment: center;
+        }
+        Text {
+            text: @tr("Heli Bypass tries dozens of settings on your connection, keeps the one that works best for Discord, YouTube and other sites, and turns it on. You don't need to know anything about it. It takes about 5-10 minutes.");
+            color: Theme.muted;
+            font-size: 13px;
+            wrap: word-wrap;
+            horizontal-alignment: center;
+        }
+        if AppState.smart-running: VerticalLayout {
+            spacing: 8px;
+            padding-top: 4px;
+            Text {
+                text: @tr("Checking options on your connection… {}%", Math.round(AppState.test-progress * 100));
+                color: Theme.text;
+                font-size: 13px;
+                horizontal-alignment: center;
+            }
+            ProgressBar { value: AppState.test-progress; }
+        }
+        if AppState.build-note != "" && !AppState.smart-running: Text {
+            text: AppState.build-note;
+            color: Theme.success;
+            font-size: 13px;
+            font-weight: 600;
+            wrap: word-wrap;
+            horizontal-alignment: center;
+        }
+        if AppState.test-error != "" && !AppState.smart-running: Text {
+            text: AppState.test-error;
+            color: Theme.danger;
+            font-size: 12px;
+            wrap: word-wrap;
+            horizontal-alignment: center;
+        }
+        HorizontalLayout {
+            alignment: center;
+            spacing: 10px;
+            if AppState.admin && !AppState.smart-running: Btn {
+                height: 50px;
+                pad: 28px;
+                font-size: 15px;
+                text: @tr("Find and turn on");
+                icon: Icons.zap;
+                enabled: !AppState.test-running;
+                clicked => { AppState.studio-auto(); }
+            }
+            if AppState.smart-running: Btn {
+                kind: 1;
+                height: 50px;
+                pad: 24px;
+                text: @tr("Stop");
+                icon: Icons.x;
+                clicked => { AppState.tests-stop(); }
+            }
+            if !AppState.admin: Btn {
+                height: 50px;
+                pad: 24px;
+                text: @tr("Restart as administrator");
+                clicked => { AppState.restart-admin(); }
+            }
+        }
+        if !AppState.admin: Text {
+            text: @tr("The bypass needs administrator rights.");
+            color: Theme.amber;
+            font-size: 12px;
+            horizontal-alignment: center;
+        }
+    }
+}
+
+export component StudioPage inherits Rectangle {
+    VerticalLayout {
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-top: 22px;
+        padding-bottom: 20px;
+        spacing: 18px;
+
+        PageHeader {
+            title: @tr("Strategy Studio");
+            subtitle: @tr("Find or build the strategy that works best on your connection, saved as customhelibypass.");
+            HorizontalLayout {
+                spacing: 10px;
+                Text {
+                    text: @tr("Advanced mode");
+                    color: AppState.studio-advanced ? Theme.text : Theme.muted;
+                    font-size: 12.5px;
+                    vertical-alignment: center;
+                }
+                VerticalLayout {
+                    alignment: center;
+                    Toggle {
+                        checked: AppState.studio-advanced;
+                        toggled(v) => {
+                            AppState.studio-advanced = v;
+                            AppState.studio-mode-changed();
+                        }
+                    }
+                }
+            }
+        }
+
+        sc := Scroller {
+            vertical-stretch: 1;
+            content-height: body.preferred-height + 8px;
+            body := VerticalLayout {
+                width: sc.width;
+                padding-right: 10px;
+                spacing: 14px;
+                alignment: start;
+                if !AppState.studio-advanced: OneClickCard { }
+                if AppState.studio-advanced: SmartCard { }
+                if AppState.studio-advanced: ManualCard { }
+                if AppState.studio-advanced: ServicesCard { }
+            }
+        }
+    }
+}

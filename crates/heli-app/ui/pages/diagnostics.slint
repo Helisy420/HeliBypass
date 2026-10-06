@@ -1,0 +1,103 @@
+import { Theme } from "../theme.slint";
+import { Card, Pill, Btn, Icon, Eyebrow, PageHeader, Scroller } from "../components.slint";
+import { AppState } from "../state.slint";
+import { Icons } from "../icons.slint";
+
+export component DiagnosticsPage inherits Rectangle {
+    VerticalLayout {
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-top: 22px;
+        padding-bottom: 22px;
+        spacing: 18px;
+
+        PageHeader {
+            title: @tr("Diagnostics");
+            subtitle: AppState.diag-summary;
+            Btn {
+                text: AppState.diag-running ? @tr("Checking…") : @tr("Run diagnostics");
+                icon: Icons.activity;
+                enabled: !AppState.diag-running;
+                clicked => { AppState.diag-run(); }
+            }
+        }
+
+        Card {
+            vertical-stretch: 1;
+            Scroller {
+                content-height: list.preferred-height + 16px;
+                list := VerticalLayout {
+                    padding: 8px;
+                    spacing: 2px;
+                    alignment: start;
+                    for c[i] in AppState.checks: Rectangle {
+                        background: transparent;
+                        VerticalLayout {
+                            if i > 0: Rectangle {
+                                height: 1px;
+                                background: Theme.border.with-alpha(0.6);
+                            }
+                            HorizontalLayout {
+                                padding: 14px;
+                                padding-left: 16px;
+                                padding-right: 14px;
+                                spacing: 14px;
+                                Rectangle {
+                                    width: 28px;
+                                    height: 28px;
+                                    y: 2px;
+                                    border-radius: 14px;
+                                    background: (c.severity == 0 ? Theme.success : c.severity == 1 ? Theme.amber : Theme.danger).with-alpha(0.16);
+                                    Icon {
+                                        source: c.severity == 0 ? Icons.check : c.severity == 1 ? Icons.alert : Icons.x;
+                                        color: c.severity == 0 ? Theme.success : c.severity == 1 ? Theme.amber : Theme.danger;
+                                        size: 15px;
+                                        x: 6.5px;
+                                        y: 6.5px;
+                                    }
+                                }
+                                VerticalLayout {
+                                    horizontal-stretch: 1;
+                                    spacing: 4px;
+                                    alignment: center;
+                                    Text {
+                                        text: c.title;
+                                        color: Theme.text;
+                                        font-size: 13.5px;
+                                        font-weight: 600;
+                                    }
+                                    Text {
+                                        text: c.detail;
+                                        color: Theme.muted;
+                                        font-size: 12px;
+                                        wrap: word-wrap;
+                                    }
+                                }
+                                if c.fix != "": VerticalLayout {
+                                    alignment: center;
+                                    horizontal-stretch: 0;
+                                    Btn {
+                                        kind: 1;
+                                        height: 34px;
+                                        pad: 14px;
+                                        text: c.fix;
+                                        clicked => { AppState.diag-fix(c.id); }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if AppState.checks.length == 0: Rectangle {
+                        height: 120px;
+                        Text {
+                            text: AppState.diag-running ? @tr("Checking your system…") : @tr("Nothing checked yet.");
+                            color: Theme.dim;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

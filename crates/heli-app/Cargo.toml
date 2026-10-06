@@ -1,0 +1,36 @@
+[package]
+name = "heli-bypass"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "HeliBypass: Telegram proxy and DPI bypass in one fast Windows app"
+
+[dependencies]
+heli-core = { path = "../heli-core" }
+heli-tgproxy = { path = "../heli-tgproxy" }
+heli-zapret = { path = "../heli-zapret" }
+slint = { version = "1.18", default-features = false, features = ["std", "backend-winit", "renderer-software", "compat-1-2", "raw-window-handle-06"] }
+raw-window-handle = "0.6"
+tray-icon = { version = "0.26", default-features = false }
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+hex.workspace = true
+rand.workspace = true
+windows-sys = { workspace = true, features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Globalization",
+    "Win32_Graphics_Dwm",
+    "Win32_Graphics_Gdi",
+    "Win32_System_DataExchange",
+    "Win32_System_Memory",
+    "Win32_System_Threading",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[build-dependencies]
+slint-build = "1.18"
+winresource = "0.1"

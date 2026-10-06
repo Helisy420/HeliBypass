@@ -1,0 +1,507 @@
+import { Theme } from "theme.slint";
+import { Card, Pill, Btn, Icon, CodeEditor } from "components.slint";
+import { AppState } from "state.slint";
+import { Icons } from "icons.slint";
+import { OverviewPage } from "pages/overview.slint";
+import { TelegramPage } from "pages/telegram.slint";
+import { StrategiesPage } from "pages/strategies.slint";
+import { TestsPage } from "pages/tests.slint";
+import { ServicePage } from "pages/service.slint";
+import { IpsetPage } from "pages/ipset.slint";
+import { DiagnosticsPage } from "pages/diagnostics.slint";
+import { SettingsPage } from "pages/settings.slint";
+import { StudioPage } from "pages/studio.slint";
+import { TrayMenu } from "tray.slint";
+
+export { TrayMenu }
+
+export { AppState, Theme, Icons }
+
+component WindowButton inherits Rectangle {
+    in property <image> icon;
+    in property <bool> danger: false;
+    callback clicked();
+    width: 34px;
+    height: 28px;
+    border-radius: 8px;
+    background: ta.has-hover ? (danger ? Theme.danger.with-alpha(0.9) : Theme.surface2) : transparent;
+    animate background { duration: 100ms; }
+    Icon {
+        source: root.icon;
+        size: 15px;
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        color: ta.has-hover && root.danger ? Theme.bg : Theme.muted;
+    }
+    ta := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}
+
+// Compact EN / RU switch for the title bar.
+component LangSwitch inherits Rectangle {
+    width: 74px;
+    height: 26px;
+    border-radius: 13px;
+    background: Theme.surface;
+    border-width: 1px;
+    border-color: Theme.border;
+    HorizontalLayout {
+        padding: 2px;
+        for code[i] in ["EN", "RU"]: Rectangle {
+            horizontal-stretch: 1;
+            border-radius: 11px;
+            background: AppState.language == i ? Theme.accent : transparent;
+            animate background { duration: 120ms; }
+            Text {
+                width: parent.width;
+                height: parent.height;
+                text: code;
+                color: AppState.language == i ? Theme.bg : Theme.muted;
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.6px;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+            TouchArea {
+                mouse-cursor: pointer;
+                clicked => { AppState.language-changed(i); }
+            }
+        }
+    }
+}
+
+component NavItem inherits Rectangle {
+    in property <image> icon;
+    in property <string> label;
+    in property <bool> active;
+    in property <string> badge: "";
+    callback clicked();
+    height: 40px;
+    border-radius: 10px;
+    background: active ? Theme.surface2 : ta.has-hover ? Theme.surface : transparent;
+    animate background { duration: 100ms; }
+    HorizontalLayout {
+        padding-left: 14px;
+        padding-right: 12px;
+        spacing: 13px;
+        Icon {
+            source: root.icon;
+            color: root.active ? Theme.accent : Theme.muted;
+            y: (parent.height - self.height) / 2;
+        }
+        Text {
+            text: root.label;
+            color: root.active ? Theme.text : Theme.muted;
+            font-size: 13px;
+            font-weight: 500;
+            vertical-alignment: center;
+            horizontal-stretch: 1;
+        }
+        if root.badge != "": VerticalLayout {
+            alignment: center;
+            Pill {
+                text: root.badge;
+                tone: 2;
+                dot: false;
+            }
+        }
+    }
+    ta := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}
+
+export component MainWindow inherits Window {
+    in property <image> app-icon;
+    callback minimize();
+    callback toggle-maximize();
+    callback close-window();
+
+    title: "Heli Bypass";
+    icon: app-icon;
+    no-frame: true;
+    resize-border-width: 6px;
+    default-font-family: Theme.sans;
+    default-font-size: 13px;
+    default-font-weight: 500;
+    background: Theme.window;
+    preferred-width: 1120px;
+    preferred-height: 760px;
+    min-width: 980px;
+    min-height: 660px;
+
+    VerticalLayout {
+        // ── title bar ──
+        Rectangle {
+            height: 46px;
+            background: Theme.bg;
+            WindowMoveArea {
+                HorizontalLayout {
+                    padding-left: 20px;
+                    padding-right: 12px;
+                    spacing: 10px;
+                    Image {
+                        source: Icons.mark;
+                        width: 18px;
+                        height: 18px;
+                        y: (parent.height - self.height) / 2;
+                    }
+                    Text {
+                        text: "Heli Bypass";
+                        color: Theme.muted;
+                        font-size: 13px;
+                        font-weight: 500;
+                        vertical-alignment: center;
+                    }
+                    Rectangle { horizontal-stretch: 1; }
+                }
+            }
+            HorizontalLayout {
+                alignment: end;
+                padding-right: 12px;
+                spacing: 4px;
+                VerticalLayout {
+                    alignment: center;
+                    HorizontalLayout {
+                        spacing: 4px;
+                        VerticalLayout {
+                            alignment: center;
+                            padding-right: 8px;
+                            LangSwitch { }
+                        }
+                        WindowButton {
+                            icon: Icons.minus;
+                            clicked => { root.minimize(); }
+                        }
+                        WindowButton {
+                            icon: Icons.stop;
+                            clicked => { root.toggle-maximize(); }
+                        }
+                        WindowButton {
+                            icon: Icons.x;
+                            danger: true;
+                            clicked => { root.close-window(); }
+                        }
+                    }
+                }
+            }
+            Rectangle {
+                y: parent.height - 1px;
+                height: 1px;
+                background: Theme.border;
+            }
+        }
+
+        HorizontalLayout {
+            // ── sidebar ──
+            Rectangle {
+                width: 232px;
+                background: Theme.bg;
+                VerticalLayout {
+                    padding: 16px;
+                    padding-top: 22px;
+                    spacing: 6px;
+                    HorizontalLayout {
+                        spacing: 12px;
+                        padding-left: 8px;
+                        padding-bottom: 20px;
+                        Image {
+                            source: Icons.mark;
+                            width: 30px;
+                            height: 30px;
+                            y: 2px;
+                        }
+                        VerticalLayout {
+                            alignment: center;
+                            spacing: 1px;
+                            Text {
+                                text: "Heli Bypass";
+                                color: Theme.text;
+                                font-size: 16px;
+                                font-weight: 600;
+                            }
+                            Text {
+                                text: AppState.version;
+                                color: Theme.dim;
+                                font-size: 11px;
+                            }
+                        }
+                    }
+                    NavItem {
+                        icon: Icons.home;
+                        label: @tr("Overview");
+                        active: AppState.page == 0;
+                        clicked => { AppState.page = 0; }
+                    }
+                    NavItem {
+                        icon: Icons.send;
+                        label: @tr("Telegram Proxy");
+                        active: AppState.page == 1;
+                        clicked => { AppState.page = 1; }
+                    }
+                    NavItem {
+                        icon: Icons.list;
+                        label: @tr("Strategies");
+                        active: AppState.page == 2;
+                        clicked => { AppState.page = 2; }
+                    }
+                    NavItem {
+                        icon: Icons.flask;
+                        label: @tr("Run tests");
+                        active: AppState.page == 3;
+                        clicked => { AppState.page = 3; }
+                    }
+                    NavItem {
+                        icon: Icons.sparkles;
+                        label: @tr("Studio");
+                        badge: "BETA";
+                        active: AppState.page == 8;
+                        clicked => { AppState.page = 8; }
+                    }
+                    NavItem {
+                        icon: Icons.server;
+                        label: @tr("Service");
+                        active: AppState.page == 4;
+                        clicked => { AppState.page = 4; }
+                    }
+                    NavItem {
+                        icon: Icons.globe;
+                        label: @tr("IPSet & Hosts");
+                        active: AppState.page == 5;
+                        clicked => { AppState.page = 5; }
+                    }
+                    NavItem {
+                        icon: Icons.wrench;
+                        label: @tr("Diagnostics");
+                        active: AppState.page == 6;
+                        clicked => { AppState.page = 6; }
+                    }
+                    NavItem {
+                        icon: Icons.sliders;
+                        label: @tr("Settings");
+                        active: AppState.page == 7;
+                        clicked => { AppState.page = 7; }
+                    }
+                    Rectangle { vertical-stretch: 1; }
+                    Card {
+                        height: 68px;
+                        border-radius: 12px;
+                        VerticalLayout {
+                            padding: 12px;
+                            spacing: 7px;
+                            alignment: center;
+                            HorizontalLayout {
+                                alignment: start;
+                                Pill {
+                                    text: AppState.lists-text;
+                                    tone: AppState.lists-tone;
+                                }
+                            }
+                            Text {
+                                text: AppState.lists-sub;
+                                color: Theme.dim;
+                                font-size: 11px;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ── page ──
+            Rectangle {
+                horizontal-stretch: 1;
+                background: Theme.window;
+                VerticalLayout {
+                    if !AppState.admin: Rectangle {
+                        height: 44px;
+                        background: Theme.amber.with-alpha(0.10);
+                        HorizontalLayout {
+                            padding-left: 24px;
+                            padding-right: 24px;
+                            spacing: 12px;
+                            Icon {
+                                source: Icons.alert;
+                                color: Theme.amber;
+                                size: 16px;
+                                y: (parent.height - self.height) / 2;
+                            }
+                            Text {
+                                horizontal-stretch: 1;
+                                text: @tr("Running without administrator rights: the Telegram proxy works, but the bypass needs elevation.");
+                                color: Theme.amber;
+                                font-size: 12px;
+                                vertical-alignment: center;
+                                overflow: elide;
+                            }
+                            VerticalLayout {
+                                alignment: center;
+                                Btn {
+                                    kind: 1;
+                                    height: 28px;
+                                    pad: 12px;
+                                    text: @tr("Restart as administrator");
+                                    clicked => { AppState.restart-admin(); }
+                                }
+                            }
+                        }
+                    }
+                    Rectangle {
+                        vertical-stretch: 1;
+                        if AppState.page == 0: OverviewPage { }
+                        if AppState.page == 1: TelegramPage { }
+                        if AppState.page == 2: StrategiesPage { }
+                        if AppState.page == 3: TestsPage { }
+                        if AppState.page == 4: ServicePage { }
+                        if AppState.page == 5: IpsetPage { }
+                        if AppState.page == 6: DiagnosticsPage { }
+                        if AppState.page == 7: SettingsPage { }
+                        if AppState.page == 8: StudioPage { }
+                    }
+                }
+            }
+        }
+    }
+
+    // in-app editor for the user lists (modal)
+    if AppState.list-editor-open: Rectangle {
+        background: #050814b8;
+        // swallow clicks on the dimmed page behind the dialog
+        TouchArea { }
+        FocusScope {
+            key-pressed(e) => {
+                if (e.text == Key.Escape) {
+                    AppState.list-editor-open = false;
+                    return accept;
+                }
+                // Ctrl+S arrives as "s", as the control character 0x13, or as the active layout's letter
+                if (e.modifiers.control && (e.text == "s" || e.text == "S" || e.text == "\u{13}" || e.text == "ы" || e.text == "Ы")) {
+                    AppState.list-save();
+                    return accept;
+                }
+                reject
+            }
+            Rectangle {
+                width: min(700px, root.width - 96px);
+                height: min(580px, root.height - 96px);
+                x: (parent.width - self.width) / 2;
+                y: (parent.height - self.height) / 2;
+                background: Theme.surface;
+                border-radius: Theme.r-card;
+                border-width: 1px;
+                border-color: Theme.border;
+                drop-shadow-blur: 40px;
+                drop-shadow-color: #00000080;
+                VerticalLayout {
+                    padding: 22px;
+                    padding-top: 20px;
+                    spacing: 12px;
+                    HorizontalLayout {
+                        spacing: 12px;
+                        VerticalLayout {
+                            horizontal-stretch: 1;
+                            spacing: 5px;
+                            Text {
+                                text: AppState.list-editor-title;
+                                color: Theme.text;
+                                font-size: 18px;
+                                font-weight: 600;
+                            }
+                            Text {
+                                text: AppState.list-editor-hint;
+                                color: Theme.muted;
+                                font-size: 12px;
+                                wrap: word-wrap;
+                            }
+                        }
+                        VerticalLayout {
+                            alignment: start;
+                            WindowButton {
+                                icon: Icons.x;
+                                clicked => { AppState.list-editor-open = false; }
+                            }
+                        }
+                    }
+                    CodeEditor {
+                        vertical-stretch: 1;
+                        text <=> AppState.list-editor-text;
+                        edited(t) => { AppState.list-edited(t); }
+                        init => { self.focus-editor(); }
+                    }
+                    HorizontalLayout {
+                        spacing: 12px;
+                        VerticalLayout {
+                            horizontal-stretch: 1;
+                            alignment: center;
+                            spacing: 2px;
+                            Text {
+                                text: AppState.list-editor-error != "" ? AppState.list-editor-error : AppState.list-editor-status;
+                                color: AppState.list-editor-error != "" ? Theme.danger : Theme.muted;
+                                font-size: 12px;
+                                overflow: elide;
+                            }
+                            Text {
+                                text: @tr("Lines starting with # are comments. Ctrl+S saves, Esc closes.");
+                                color: Theme.dim;
+                                font-size: 11px;
+                                overflow: elide;
+                            }
+                        }
+                        Btn {
+                            kind: 1;
+                            height: 40px;
+                            pad: 16px;
+                            font-size: 13px;
+                            text: @tr("Cancel");
+                            clicked => { AppState.list-editor-open = false; }
+                        }
+                        Btn {
+                            height: 40px;
+                            pad: 18px;
+                            font-size: 13px;
+                            text: @tr("Save");
+                            icon: Icons.check;
+                            enabled: AppState.list-editor-error == "";
+                            clicked => { AppState.list-save(); }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // transient message (copied, saved, errors)
+    if AppState.toast != "": Rectangle {
+        x: (parent.width - self.width) / 2 + 116px;
+        y: parent.height - 76px;
+        width: min(560px, toast-text.preferred-width + 56px);
+        height: 42px;
+        border-radius: 21px;
+        background: Theme.surface2;
+        border-width: 1px;
+        border-color: AppState.toast-tone == 3 ? Theme.danger : AppState.toast-tone == 2 ? Theme.amber : Theme.accent;
+        HorizontalLayout {
+            padding-left: 18px;
+            padding-right: 18px;
+            alignment: center;
+            toast-text := Text {
+                text: AppState.toast;
+                color: Theme.text;
+                font-size: 12.5px;
+                font-weight: 500;
+                vertical-alignment: center;
+                overflow: elide;
+            }
+        }
+    }
+
+    // 1px frame, drawn on top so the window edge stays crisp against the desktop
+    Rectangle {
+        border-width: 1px;
+        border-color: Theme.border;
+        background: transparent;
+    }
+}

@@ -1,0 +1,34 @@
+// Helisy design tokens (shared by TG WS Proxy and Heli Bypass).
+// Text is Montserrat Medium (500) throughout, SemiBold (600) for titles; no Regular weight
+// is bundled, so nothing can fall back to the thinner cut.
+import "../../../assets/fonts/Montserrat-Medium.ttf";
+import "../../../assets/fonts/Montserrat-SemiBold.ttf";
+import "../../../assets/fonts/JetBrainsMono-Medium.ttf";
+
+export global Theme {
+    // surfaces
+    out property <color> bg: #0B0F1E;        // title bar, sidebar, inset wells
+    out property <color> window: #0E1326;    // window body
+    out property <color> surface: #121830;   // cards
+    out property <color> surface2: #171E3B;  // raised controls
+    out property <color> border: #242D52;
+    // text
+    out property <color> text: #E4E8F6;
+    out property <color> muted: #A5AECB;
+    out property <color> dim: #6B7699;
+    // brand + status
+    out property <color> accent: #7589DB;
+    out property <color> accent-dark: #5368C6;
+    out property <color> amber: #F0B45C;
+    out property <color> success: #5FD39A;
+    out property <color> danger: #F07A86;
+
+    out property <string> sans: "Montserrat";
+    out property <string> mono: "JetBrains Mono";
+
+    // shape
+    out property <length> r-window: 18px;
+    out property <length> r-card: 16px;
+    out property <length> r-button: 12px;
+    out property <length> r-input: 10px;
+}

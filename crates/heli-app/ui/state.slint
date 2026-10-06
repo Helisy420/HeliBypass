@@ -1,0 +1,199 @@
+// Everything the UI shows, and everything it can ask for. Rust owns the logic: it fills the
+// `in` properties and implements the callbacks (see src/ui_bridge.rs).
+
+export struct HealthRow { name: string, ms: string, ok: bool }
+export struct LogRow { time: string, source: string, message: string, level: int }
+export struct StrategyRow { name: string, technique: string, note: string, selected: bool }
+// g0..g3: 0 pending, 1 ok, 2 partial, 3 fail
+// d0..d2: text columns used by the DPI table instead of g0..g3
+export struct TestRow { name: string, g0: int, g1: int, g2: int, g3: int, score: string, best: bool, running: bool, error: string, d0: string, d1: string, d2: string }
+// severity: 0 ok, 1 warning, 2 failure
+// live traffic: one point per second, both values scaled 0..1 against the same maximum
+export struct GraphPoint { down: float, up: float }
+// kind: route id (1 direct, 2 Cloudflare, 3 worker, 4 TCP, 5 HTTP/2 booster); share: part of the download rate
+export struct RouteRow { dc: string, route: string, kind: int, sessions: string, down: string, up: string, share: float }
+export struct ServiceRow { name: string, url: string }
+export struct CheckRow { id: string, title: string, detail: string, severity: int, fix: string }
+
+export global AppState {
+    // ── shell ──
+    in-out property <int> page: 0;
+    in property <string> version: "v1.0.0";
+    in property <bool> admin: true;
+    in property <string> lists-text: "Lists up to date";
+    in property <string> lists-sub: "Checked just now";
+    in property <int> lists-tone: 1; // 1 ok, 2 outdated, 0 unknown
+    in property <string> toast: "";
+    in property <int> toast-tone: 1;
+
+    // ── overview ──
+    in property <bool> protected: false;
+    in property <[HealthRow]> health;
+    in property <[LogRow]> activity;
+
+    // ── telegram proxy ──
+    in property <bool> tg-running: false;
+    in property <bool> tg-busy: false;
+    in property <string> tg-addr: "127.0.0.1:1443";
+    in property <string> tg-route: "via Cloudflare";
+    in property <string> tg-dcs: "DC2 / DC4";
+    in property <string> tg-latency: "—";
+    in property <string> tg-latency-sub: "to DC2";
+    in property <string> tg-sessions: "0";
+    in property <string> tg-traffic: "0 B";
+    in property <string> tg-traffic-sub: "in · 0 B ↑";
+    in property <string> tg-error: "";
+    in property <string> tg-route-note: "Direct WebSocket: DC2 / DC4. Other data centers and fallbacks go through Cloudflare.";
+    in-out property <string> tg-host: "127.0.0.1";
+    in-out property <string> tg-port: "1443";
+    in-out property <string> tg-secret: "";
+    in-out property <string> tg-dc-rules: "";
+    in-out property <bool> tg-cf: true;
+    in-out property <bool> tg-tcp-fallback: true;
+    in-out property <bool> tg-h2: false;
+    // speed cap in MB/s (text field) and the "no limit" switch
+    in-out property <string> tg-limit-text: "10";
+    in-out property <bool> tg-unlimited: false;
+    in property <string> tg-down: "0 B/s";
+    in property <string> tg-up: "0 B/s";
+    in property <string> tg-peak: "";
+    in property <[GraphPoint]> tg-graph;
+    in property <[RouteRow]> tg-routes;
+    in property <bool> tg-cf-testing: false;
+    in property <string> tg-cf-result: "";
+
+    // ── bypass engine ──
+    in property <int> bp-state: 0; // 0 stopped, 1 starting, 2 running, 3 failed
+    in property <string> bp-strategy: "general";
+    in property <string> bp-error: "";
+    in property <[string]> bp-chips;
+    in property <[StrategyRow]> strategies;
+    in property <string> strategy-filter: "";
+
+    // ── tests ──
+    in property <int> test-tab: 0;
+    in property <bool> test-running: false;
+    in property <float> test-progress: 0;
+    in property <string> test-label: "Ready";
+    in property <string> test-count: "";
+    in property <[TestRow]> test-rows;
+    in property <string> test-best: "";
+    in property <string> test-footer: "";
+    in property <string> test-error: "";
+    // ── Strategy Studio (BETA) ──
+    in property <string> build-base: "";
+    in property <string> build-note: "";
+    in property <bool> smart-running: false;
+    in-out property <bool> studio-advanced: false;
+    // hand-made strategy: applied on top of this one
+    in property <string> studio-base: "";
+    in-out property <int> studio-tech: 0;      // multisplit, fakedsplit, multidisorder, hostfakesplit
+    in-out property <bool> studio-fake: false; // add fake packets
+    in-out property <string> studio-pos: "";
+    in-out property <string> studio-seqovl: "";
+    in-out property <int> studio-fooling: 0;   // none, ts, md5sig, badseq
+    in-out property <string> studio-repeats: "";
+    in-out property <int> studio-file: 0;      // fake ClientHello file
+    in-out property <string> studio-host: "";
+    in-out property <string> studio-quic: "";
+    in-out property <string> studio-voice: "";
+    in property <string> studio-preview: "";
+    in-out property <string> studio-problems: "";
+    // the user's own services in the tests
+    in property <[ServiceRow]> services;
+    in-out property <string> tsvc-name: "";
+    in-out property <string> tsvc-url: "";
+    in-out property <string> tsvc-error: "";
+
+    // ── service ──
+    in property <string> svc-state: "Not installed";
+    in property <int> svc-tone: 0;
+    in property <string> svc-strategy: "";
+    in property <string> svc-driver: "";
+    in property <bool> svc-installed: false;
+    in property <bool> svc-busy: false;
+
+    // ── ipset / hosts / game filter ──
+    in-out property <int> ipset-mode: 0; // 0 none, 1 loaded, 2 any
+    in property <string> ipset-info: "";
+    in property <bool> ipset-busy: false;
+    in-out property <int> game-mode: 0; // 0 off, 1 tcp+udp, 2 tcp, 3 udp
+    in-out property <string> game-tcp: "1024-65535";
+    in-out property <string> game-udp: "1024-65535";
+    in property <string> game-error: "";
+    in property <string> hosts-state: "Unknown";
+    in property <int> hosts-tone: 0;
+    in property <string> hosts-info: "";
+    in property <bool> hosts-busy: false;
+
+    // ── user lists (edited in the app) ──
+    in property <[string]> list-counts: ["", "", ""];
+    in-out property <bool> list-editor-open: false;
+    in property <int> list-editor-id: 0;
+    in property <string> list-editor-title;
+    in property <string> list-editor-hint;
+    in-out property <string> list-editor-text;
+    in property <string> list-editor-status;
+    in property <string> list-editor-error;
+
+    // ── diagnostics ──
+    in property <[CheckRow]> checks;
+    in property <bool> diag-running: false;
+    in property <string> diag-summary: "Run diagnostics to check your system.";
+
+    // ── settings ──
+    in-out property <bool> set-launch-login: false;
+    in-out property <bool> set-start-min: false;
+    in-out property <bool> set-close-tray: true;
+    in-out property <bool> set-check-updates: true;
+    in-out property <bool> set-tg-autostart: true;
+    in-out property <bool> set-bp-autostart: false;
+    in-out property <bool> set-verbose: false;
+    in property <string> data-dir: "";
+    in-out property <int> language: 0; // 0 English, 1 Русский
+
+    // ── callbacks implemented in Rust ──
+    callback toggle-all();
+    callback tg-toggle();
+    callback tg-open();
+    callback tg-copy-link();
+    callback tg-save();
+    callback tg-cancel();
+    callback tg-regen-secret();
+    callback tg-test-cf();
+    callback tg-limit-changed();
+    callback bp-toggle();
+    callback bp-select(string);
+    callback set-strategy-filter(string);
+    callback tests-run-all();
+    callback tests-stop();
+    callback tests-switch-tab(int);
+    callback studio-smart();
+    callback studio-auto();
+    callback studio-mode-changed();
+    callback studio-load();
+    callback studio-changed();
+    callback studio-test();
+    callback studio-save();
+    callback service-add();
+    callback service-remove(int);
+    callback tests-use-best();
+    callback tests-export();
+    callback svc-install();
+    callback svc-remove();
+    callback ipset-set(int);
+    callback ipset-update();
+    callback game-apply();
+    callback hosts-update();
+    callback hosts-restore();
+    callback list-open(int);
+    callback list-edited(string);
+    callback list-save();
+    callback diag-run();
+    callback diag-fix(string);
+    callback settings-changed();
+    callback language-changed(int);
+    callback open-data-dir();
+    callback open-url(string);
+    callback restart-admin();
+}

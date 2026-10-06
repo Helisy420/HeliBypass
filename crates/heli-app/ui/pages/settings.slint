@@ -1,0 +1,283 @@
+import { Theme } from "../theme.slint";
+import { Card, Pill, Btn, Icon, Eyebrow, PageHeader, Toggle, Scroller, Segmented } from "../components.slint";
+import { AppState } from "../state.slint";
+import { Icons } from "../icons.slint";
+
+component Row inherits Rectangle {
+    in property <string> title;
+    in property <string> desc;
+    in-out property <bool> checked;
+    callback toggled(bool);
+    height: 58px;
+    HorizontalLayout {
+        spacing: 16px;
+        VerticalLayout {
+            horizontal-stretch: 1;
+            alignment: center;
+            spacing: 3px;
+            Text {
+                text: root.title;
+                color: Theme.text;
+                font-size: 13.5px;
+                font-weight: 500;
+            }
+            Text {
+                text: root.desc;
+                color: Theme.dim;
+                font-size: 11.5px;
+                overflow: elide;
+            }
+        }
+        VerticalLayout {
+            alignment: center;
+            Toggle {
+                checked: root.checked;
+                toggled(v) => {
+                    root.checked = v;
+                    root.toggled(v);
+                }
+            }
+        }
+    }
+}
+
+component Sep inherits Rectangle {
+    height: 1px;
+    background: Theme.border.with-alpha(0.7);
+}
+
+export component SettingsPage inherits Rectangle {
+    VerticalLayout {
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-top: 22px;
+        padding-bottom: 12px;
+        spacing: 18px;
+
+        PageHeader {
+            title: @tr("Settings");
+            subtitle: @tr("Startup behaviour, tray and housekeeping.");
+        }
+
+        Scroller {
+            vertical-stretch: 1;
+            content-height: col.preferred-height + 12px;
+            col := VerticalLayout {
+                spacing: 14px;
+                alignment: start;
+                padding-right: 10px;
+
+                Card {
+                    height: 108px;
+                    VerticalLayout {
+                        padding: 18px;
+                        padding-left: 20px;
+                        padding-right: 20px;
+                        spacing: 14px;
+                        Eyebrow {
+                            text: @tr("Language");
+                            height: 20px;
+                        }
+                        HorizontalLayout {
+                            alignment: start;
+                            Segmented {
+                                width: 300px;
+                                labels: ["English", "Русский"];
+                                current: AppState.language;
+                                selected(i) => { AppState.language-changed(i); }
+                            }
+                        }
+                    }
+                }
+
+                Card {
+                    height: 20px + 24px + 4 * 58px + 3 * 1px + 14px;
+                    VerticalLayout {
+                        padding: 18px;
+                        padding-left: 20px;
+                        padding-right: 20px;
+                        padding-bottom: 8px;
+                        spacing: 0;
+                        Eyebrow {
+                            text: @tr("General");
+                            height: 24px;
+                        }
+                        Row {
+                            title: @tr("Launch at login");
+                            desc: @tr("Start HeliBypass automatically when you sign in to Windows.");
+                            checked <=> AppState.set-launch-login;
+                            toggled(v) => { AppState.settings-changed(); }
+                        }
+                        Sep { }
+                        Row {
+                            title: @tr("Start minimized to tray");
+                            desc: @tr("Open in the system tray instead of showing the window.");
+                            checked <=> AppState.set-start-min;
+                            toggled(v) => { AppState.settings-changed(); }
+                        }
+                        Sep { }
+                        Row {
+                            title: @tr("Close button hides to tray");
+                            desc: @tr("Keep the proxy and bypass running when the window is closed.");
+                            checked <=> AppState.set-close-tray;
+                            toggled(v) => { AppState.settings-changed(); }
+                        }
+                        Sep { }
+                        Row {
+                            title: @tr("Check for updates");
+                            desc: @tr("Look for new lists and strategy releases on GitHub.");
+                            checked <=> AppState.set-check-updates;
+                            toggled(v) => { AppState.settings-changed(); }
+                        }
+                    }
+                }
+
+                Card {
+                    height: 20px + 24px + 3 * 58px + 2 * 1px + 14px;
+                    VerticalLayout {
+                        padding: 18px;
+                        padding-left: 20px;
+                        padding-right: 20px;
+                        padding-bottom: 8px;
+                        spacing: 0;
+                        Eyebrow {
+                            text: @tr("On start");
+                            height: 24px;
+                        }
+                        Row {
+                            title: @tr("Start the Telegram proxy");
+                            desc: @tr("Listen on the configured address as soon as the app starts.");
+                            checked <=> AppState.set-tg-autostart;
+                            toggled(v) => { AppState.settings-changed(); }
+                        }
+                        Sep { }
+                        Row {
+                            title: @tr("Start the bypass");
+                            desc: @tr("Launch the selected strategy automatically (needs administrator rights).");
+                            checked <=> AppState.set-bp-autostart;
+                            toggled(v) => { AppState.settings-changed(); }
+                        }
+                        Sep { }
+                        Row {
+                            title: @tr("Verbose logging");
+                            desc: @tr("Write detailed connection logs to the data folder.");
+                            checked <=> AppState.set-verbose;
+                            toggled(v) => { AppState.settings-changed(); }
+                        }
+                    }
+                }
+
+                Card {
+                    height: 112px;
+                    VerticalLayout {
+                        padding: 18px;
+                        padding-left: 20px;
+                        padding-right: 20px;
+                        spacing: 12px;
+                        Eyebrow {
+                            text: @tr("Data folder");
+                            height: 20px;
+                        }
+                        HorizontalLayout {
+                            spacing: 12px;
+                            Text {
+                                horizontal-stretch: 1;
+                                text: AppState.data-dir;
+                                color: Theme.muted;
+                                font-size: 12px;
+                                font-family: Theme.mono;
+                                vertical-alignment: center;
+                                overflow: elide;
+                            }
+                            Btn {
+                                kind: 1;
+                                height: 36px;
+                                pad: 14px;
+                                text: @tr("Open");
+                                icon: Icons.folder;
+                                clicked => { AppState.open-data-dir(); }
+                            }
+                        }
+                    }
+                }
+
+                Card {
+                    VerticalLayout {
+                        padding: 18px;
+                        padding-left: 20px;
+                        padding-right: 20px;
+                        spacing: 10px;
+                        Eyebrow {
+                            text: @tr("About");
+                            height: 20px;
+                        }
+                        Text {
+                            text: "Heli Bypass " + AppState.version;
+                            color: Theme.text;
+                            font-size: 14px;
+                            font-weight: 600;
+                        }
+                        // the creator
+                        HorizontalLayout {
+                            spacing: 10px;
+                            alignment: start;
+                            Btn {
+                                kind: 1;
+                                height: 34px;
+                                pad: 12px;
+                                font-size: 13px;
+                                text: @tr("Telegram channel");
+                                icon: Icons.send;
+                                clicked => { AppState.open-url("https://t.me/helisy420"); }
+                            }
+                            Btn {
+                                kind: 1;
+                                height: 34px;
+                                pad: 12px;
+                                font-size: 13px;
+                                text: @tr("Creator");
+                                icon: Icons.send;
+                                clicked => { AppState.open-url("https://t.me/helisy"); }
+                            }
+                            Btn {
+                                kind: 1;
+                                height: 34px;
+                                pad: 12px;
+                                font-size: 13px;
+                                text: "GitHub";
+                                icon: Icons.external;
+                                clicked => { AppState.open-url("https://github.com/helisy420"); }
+                            }
+                        }
+                        Text {
+                            text: @tr("One app for Telegram access and DPI bypass. Built on tg-ws-proxy and zapret-discord-youtube by Flowseal (MIT), zapret by bol-van and WinDivert.");
+                            color: Theme.muted;
+                            font-size: 12px;
+                            wrap: word-wrap;
+                        }
+                        HorizontalLayout {
+                            spacing: 10px;
+                            alignment: start;
+                            Btn {
+                                kind: 3;
+                                height: 32px;
+                                pad: 10px;
+                                text: "tg-ws-proxy";
+                                icon: Icons.external;
+                                clicked => { AppState.open-url("https://github.com/Flowseal/tg-ws-proxy"); }
+                            }
+                            Btn {
+                                kind: 3;
+                                height: 32px;
+                                pad: 10px;
+                                text: "zapret-discord-youtube";
+                                icon: Icons.external;
+                                clicked => { AppState.open-url("https://github.com/Flowseal/zapret-discord-youtube"); }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

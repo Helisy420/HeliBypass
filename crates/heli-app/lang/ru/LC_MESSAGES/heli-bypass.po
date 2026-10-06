@@ -1,0 +1,1032 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: heli-bypass\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+# ───────────── interface (Slint) ─────────────
+
+msgid "A strategy decides how the bypass disguises your traffic. Run tests to find the one that works best on your connection."
+msgstr "Стратегия определяет, как обход маскирует ваш трафик. Запустите тесты, чтобы найти лучшую для вашего подключения."
+
+msgid "About"
+msgstr "О программе"
+
+msgid "Activity"
+msgstr "Активность"
+
+msgid "Addresses to leave alone"
+msgstr "Адреса, которые не трогать"
+
+msgid "Any"
+msgstr "Все"
+
+msgid "Any: the bypass touches every address. Needed for DPI tests; may break other sites."
+msgstr "Все: обход затрагивает любые адреса. Нужно для DPI-тестов, но может сломать другие сайты."
+
+msgid "Apply"
+msgstr "Применить"
+
+msgid "Best"
+msgstr "Лучшая"
+
+msgid "Blocked"
+msgstr "Блок"
+
+msgid "Bypass"
+msgstr "Обход"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "Check for updates"
+msgstr "Проверять обновления"
+
+msgid "Checked just now"
+msgstr "Проверено только что"
+
+msgid "Checking your system…"
+msgstr "Проверяем систему…"
+
+msgid "Checking…"
+msgstr "Проверка…"
+
+msgid "Checks every strategy against your real connection and ranks them."
+msgstr "Проверяет каждую стратегию на вашем реальном подключении и ранжирует их."
+
+msgid "Client"
+msgstr "Клиент"
+
+msgid "Close button hides to tray"
+msgstr "Закрытие окна сворачивает в трей"
+
+msgid "Cloudflare"
+msgstr "Cloudflare"
+
+msgid "Cloudflare proxy"
+msgstr "Прокси Cloudflare"
+
+msgid "Connection health"
+msgstr "Состояние соединений"
+
+msgid "Direct WebSocket: {}. Other data centers and fallbacks go through Cloudflare."
+msgstr "Напрямую через WebSocket: {}. Остальные дата-центры и резерв идут через Cloudflare."
+
+msgid "Direct WebSocket: {}. Other data centers use the plain TCP fallback."
+msgstr "Напрямую через WebSocket: {}. Остальные дата-центры идут через резервное TCP-соединение."
+
+msgid "DPI checkers"
+msgstr "DPI-проверки"
+
+msgid "Data folder"
+msgstr "Папка данных"
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "Domains to leave alone"
+msgstr "Домены, которые не трогать"
+
+msgid "Edit"
+msgstr "Изменить"
+
+msgid "Enable CF proxy"
+msgstr "Включить CF-прокси"
+
+msgid "Example: 1024-1934,1936-65535. Restart the bypass after applying."
+msgstr "Пример: 1024-1934,1936-65535. После применения перезапустите обход."
+
+msgid "Export results"
+msgstr "Экспорт результатов"
+
+msgid "Extra domains to bypass"
+msgstr "Дополнительные домены для обхода"
+
+msgid "FAILED"
+msgstr "ОШИБКИ"
+
+msgid "FROZEN"
+msgstr "ЗАВИСШИЕ"
+
+msgid "PASSED"
+msgstr "УСПЕШНО"
+
+msgid "Failed"
+msgstr "Ошибка"
+
+msgid "Fall back to direct"
+msgstr "Резерв: прямое соединение"
+
+msgid "Filter strategies"
+msgstr "Поиск стратегий"
+
+msgid "Game filter"
+msgstr "Игровой фильтр"
+
+msgid "General"
+msgstr "Общие"
+
+msgid "Hosts file"
+msgstr "Файл hosts"
+
+msgid "IP address"
+msgstr "IP-адрес"
+
+msgid "IPSet & Hosts"
+msgstr "IPSet и Hosts"
+
+msgid "IPSet filter"
+msgstr "Фильтр IPSet"
+
+msgid "Install service"
+msgstr "Установить службу"
+
+msgid "Install the bypass as a Windows service so it starts with the system."
+msgstr "Установите обход как службу Windows, чтобы он запускался вместе с системой."
+
+msgid "Installed strategy"
+msgstr "Установленная стратегия"
+
+msgid "Keep the proxy and bypass running when the window is closed."
+msgstr "Прокси и обход продолжают работать после закрытия окна."
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Latency"
+msgstr "Задержка"
+
+msgid "Launch at login"
+msgstr "Запуск при входе в систему"
+
+msgid "Launch the selected strategy automatically (needs administrator rights)."
+msgstr "Автоматически запускать выбранную стратегию (нужны права администратора)."
+
+msgid "Listen on the configured address as soon as the app starts."
+msgstr "Слушать настроенный адрес сразу после запуска приложения."
+
+msgid "Lists up to date"
+msgstr "Списки актуальны"
+
+msgid "Loaded"
+msgstr "Загружен"
+
+msgid "Loaded: the bypass also covers every address in the IP list (Discord, YouTube, games)."
+msgstr "Загружен: обход затрагивает все адреса из списка (Discord, YouTube, игры)."
+
+msgid "Local MTProto proxy that reaches Telegram over WebSocket."
+msgstr "Локальный MTProto-прокси, который связывается с Telegram через WebSocket."
+
+msgid "Local proxy"
+msgstr "Локальный прокси"
+
+msgid "Look for new lists and strategy releases on GitHub."
+msgstr "Искать новые списки и релизы стратегий на GitHub."
+
+msgid "MTProto connection"
+msgstr "Подключение MTProto"
+
+msgid "Manage"
+msgstr "Настроить"
+
+msgid "No activity yet."
+msgstr "Пока нет событий."
+
+msgid "None"
+msgstr "Нет"
+
+msgid "None: only the domain lists apply. Safest; try this first."
+msgstr "Нет: действуют только списки доменов. Самый безопасный вариант — начните с него."
+
+msgid "Not installed"
+msgstr "Не установлена"
+
+msgid "Not protected"
+msgstr "Не защищено"
+
+msgid "Nothing checked yet."
+msgstr "Ещё ничего не проверено."
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Off"
+msgstr "Выкл"
+
+msgid "On start"
+msgstr "При запуске"
+
+msgid "One app for Telegram access and DPI bypass. Built on tg-ws-proxy and zapret-discord-youtube by Flowseal (MIT), zapret by bol-van and WinDivert."
+msgstr "Одно приложение для доступа к Telegram и обхода DPI. Основано на tg-ws-proxy и zapret-discord-youtube от Flowseal (MIT), zapret от bol-van и WinDivert."
+
+msgid "One rule per line, format: number:IP"
+msgstr "Одно правило на строку, формат: номер:IP"
+
+msgid "Open"
+msgstr "Открыть"
+
+msgid "Open Heli Bypass"
+msgstr "Открыть Heli Bypass"
+
+msgid "Open in Telegram"
+msgstr "Открыть в Telegram"
+
+msgid "Open in the system tray instead of showing the window."
+msgstr "Открываться в системном трее, не показывая окно."
+
+msgid "Overview"
+msgstr "Обзор"
+
+msgid "Port"
+msgstr "Порт"
+
+msgid "Progress"
+msgstr "Прогресс"
+
+msgid "Protected"
+msgstr "Защищено"
+
+msgid "Proxy is running"
+msgstr "Прокси работает"
+
+msgid "Proxy is stopped"
+msgstr "Прокси остановлен"
+
+msgid "Needs administrator rights"
+msgstr "Нужны права администратора"
+
+msgid "No strategy matches the filter."
+msgstr "Нет стратегий, подходящих под фильтр."
+
+msgid "Copy tg:// link"
+msgstr "Копировать ссылку"
+
+msgid "Quit"
+msgstr "Выход"
+
+msgid "Ready"
+msgstr "Готово"
+
+msgid "Reinstall with "
+msgstr "Переустановить с "
+
+msgid "Remove block"
+msgstr "Удалить блок"
+
+msgid "Remove service"
+msgstr "Удалить службу"
+
+msgid "Restart as administrator"
+msgstr "Перезапустить от администратора"
+
+msgid "Results"
+msgstr "Результаты"
+
+msgid "Route"
+msgstr "Маршрут"
+
+msgid "Run all configs"
+msgstr "Запустить все"
+
+msgid "Run diagnostics"
+msgstr "Запустить диагностику"
+
+msgid "Run diagnostics to check your system."
+msgstr "Запустите диагностику, чтобы проверить систему."
+
+msgid "Run tests"
+msgstr "Тесты"
+
+msgid "Running"
+msgstr "Работает"
+
+msgid "Running without administrator rights: the Telegram proxy works, but the bypass needs elevation."
+msgstr "Запущено без прав администратора: Telegram-прокси работает, но для обхода нужны повышенные права."
+
+msgid "Running · "
+msgstr "Работает · "
+
+msgid "Runs the bypass at system start, before you sign in. No app window and no UAC prompt needed."
+msgstr "Запускает обход при старте системы, ещё до входа в учётную запись. Окно приложения и запрос UAC не нужны."
+
+msgid "SCORE"
+msgstr "ИТОГ"
+
+msgid "STRATEGY"
+msgstr "СТРАТЕГИЯ"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Secret"
+msgstr "Секрет"
+
+msgid "Selected"
+msgstr "Выбрана"
+
+msgid "Selected strategy"
+msgstr "Выбранная стратегия"
+
+msgid "Selected · "
+msgstr "Выбрана · "
+
+msgid "Service"
+msgstr "Служба"
+
+msgid "Sessions"
+msgstr "Сессии"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Some services are reachable only with extra entries in the Windows hosts file. HeliBypass adds them as one clearly marked block and keeps a backup of your original file."
+msgstr "Некоторые сервисы доступны только при дополнительных записях в файле hosts. HeliBypass добавляет их одним чётко помеченным блоком и сохраняет копию исходного файла."
+
+msgid "Standard tests"
+msgstr "Обычные тесты"
+
+msgid "Start"
+msgstr "Запустить"
+
+msgid "Start HeliBypass automatically when you sign in to Windows."
+msgstr "Запускать HeliBypass автоматически при входе в Windows."
+
+msgid "Start all"
+msgstr "Запустить всё"
+
+msgid "Start bypass"
+msgstr "Запустить обход"
+
+msgid "Start minimized to tray"
+msgstr "Запускать свёрнутым в трей"
+
+msgid "Start proxy"
+msgstr "Запустить прокси"
+
+msgid "Start the Telegram proxy"
+msgstr "Запускать Telegram-прокси"
+
+msgid "Start the bypass"
+msgstr "Запускать обход"
+
+msgid "Starting…"
+msgstr "Запуск…"
+
+msgid "Startup behaviour, tray and housekeeping."
+msgstr "Запуск, трей и обслуживание."
+
+msgid "Stop"
+msgstr "Стоп"
+
+msgid "Stop all"
+msgstr "Остановить всё"
+
+msgid "Stopped"
+msgstr "Остановлен"
+
+msgid "Strategies"
+msgstr "Стратегии"
+
+msgid "Strategy"
+msgstr "Стратегия"
+
+msgid "TCP"
+msgstr "TCP"
+
+msgid "TCP + UDP"
+msgstr "TCP + UDP"
+
+msgid "TCP ports"
+msgstr "Порты TCP"
+
+msgid "Telegram"
+msgstr "Telegram"
+
+msgid "Telegram Proxy"
+msgstr "Прокси Telegram"
+
+msgid "Telegram data centers"
+msgstr "Дата-центры Telegram"
+
+msgid "Telegram proxy"
+msgstr "Прокси Telegram"
+
+msgid "Telegram proxy and the bypass in one place."
+msgstr "Прокси Telegram и обход блокировок в одном месте."
+
+msgid "Test"
+msgstr "Тест"
+
+msgid "Testing"
+msgstr "Идёт тест"
+
+msgid "Testing…"
+msgstr "Проверка…"
+
+msgid "The service and the in-app bypass use the same WinDivert driver, so only one can run at a time. While the service is installed, the in-app Start button and strategy tests are disabled. Remove the service to use them."
+msgstr "Служба и встроенный обход используют один драйвер WinDivert, поэтому работать может что-то одно. Пока служба установлена, кнопка запуска в приложении и тесты стратегий недоступны. Удалите службу, чтобы ими пользоваться."
+
+msgid "Traffic"
+msgstr "Трафик"
+
+msgid "UDP"
+msgstr "UDP"
+
+msgid "UDP ports"
+msgstr "Порты UDP"
+
+msgid "Unknown"
+msgstr "Неизвестно"
+
+msgid "Update hosts"
+msgstr "Обновить hosts"
+
+msgid "Update list"
+msgstr "Обновить список"
+
+msgid "Updating…"
+msgstr "Обновление…"
+
+msgid "Use"
+msgstr "Выбрать"
+
+msgid "Use best strategy"
+msgstr "Выбрать лучшую стратегию"
+
+msgid "Use “{}”"
+msgstr "Выбрать «{}»"
+
+msgid "Verbose logging"
+msgstr "Подробные логи"
+
+msgid "WebSocket"
+msgstr "WebSocket"
+
+msgid "Which addresses the bypass touches, plus game traffic and the hosts file."
+msgstr "Какие адреса затрагивает обход, а также игровой трафик и файл hosts."
+
+msgid "WinDivert driver"
+msgstr "Драйвер WinDivert"
+
+msgid "Working…"
+msgstr "Выполняется…"
+
+msgid "Write detailed connection logs to the data folder."
+msgstr "Записывать подробные логи соединений в папку данных."
+
+msgid "Your lists"
+msgstr "Ваши списки"
+
+msgid "active"
+msgstr "активных"
+
+msgid "to DC2"
+msgstr "до DC2"
+
+msgid "via Cloudflare"
+msgstr "через Cloudflare"
+
+msgid "zapret service"
+msgstr "Служба zapret"
+
+# ───────────── produced by the Rust side (src/i18n.rs) ─────────────
+
+msgid "Checked {}"
+msgstr "Проверено {}"
+
+msgid "Not checked yet"
+msgstr "Ещё не проверялось"
+
+msgid "Lists outdated"
+msgstr "Списки устарели"
+
+msgid "just now"
+msgstr "только что"
+
+msgid "{} min ago"
+msgstr "{} мин назад"
+
+msgid "{} h ago"
+msgstr "{} ч назад"
+
+msgid "{} d ago"
+msgstr "{} дн назад"
+
+msgid "Installed"
+msgstr "Установлена"
+
+msgid "Not loaded"
+msgstr "Не загружен"
+
+msgid "Up to date"
+msgstr "Актуален"
+
+msgid "Needs update"
+msgstr "Нужно обновить"
+
+msgid "Cannot read hosts file"
+msgstr "Не удаётся прочитать hosts"
+
+msgid "IPSet: {}"
+msgstr "IPSet: {}"
+
+msgid "none"
+msgstr "нет"
+
+msgid "loaded"
+msgstr "загружен"
+
+msgid "any"
+msgstr "все"
+
+msgid "{} MB"
+msgstr "{} МБ"
+
+msgid "{} in · {} out"
+msgstr "{} принято · {} отправлено"
+
+msgid "Copied the Telegram proxy link"
+msgstr "Ссылка на прокси Telegram скопирована"
+
+msgid "Saved"
+msgstr "Сохранено"
+
+msgid "Nothing to restore"
+msgstr "Нечего восстанавливать"
+
+msgid "No problems found"
+msgstr "Проблем не найдено"
+
+msgid "{} problem(s), {} warning(s)"
+msgstr "Проблем: {}, предупреждений: {}"
+
+msgid "Cloudflare is reachable ({} ms)"
+msgstr "Cloudflare доступен ({} мс)"
+
+msgid "Cloudflare is not reachable"
+msgstr "Cloudflare недоступен"
+
+msgid "Not tested"
+msgstr "Не тестировалось"
+
+msgid "Telegram proxy started"
+msgstr "Telegram-прокси запущен"
+
+msgid "Telegram proxy stopped"
+msgstr "Telegram-прокси остановлен"
+
+msgid "Bypass started · {}"
+msgstr "Обход запущен · {}"
+
+msgid "Bypass stopped"
+msgstr "Обход остановлен"
+
+msgid "Administrator rights are required to run the bypass (WinDivert needs them)."
+msgstr "Для запуска обхода нужны права администратора (их требует WinDivert)."
+
+msgid "{} of {}"
+msgstr "{} из {}"
+
+msgid "Testing {}"
+msgstr "Проверка: {}"
+
+msgid "Finished: {}"
+msgstr "Готово: {}"
+
+msgid "Cancelled"
+msgstr "Отменено"
+
+msgid "Best strategy: {}"
+msgstr "Лучшая стратегия: {}"
+
+msgid "No strategy worked"
+msgstr "Ни одна стратегия не сработала"
+
+msgid "Results are stored locally in {}"
+msgstr "Результаты сохраняются локально в {}"
+
+msgid "Not elevated. The bypass engine (WinDivert) cannot start without administrator rights."
+msgstr "Нет прав администратора. Движок обхода (WinDivert) не запустится без них."
+
+msgid "Administrator rights"
+msgstr "Права администратора"
+
+msgid "Running elevated."
+msgstr "Запущено с повышенными правами."
+
+msgid "{} ms"
+msgstr "{} мс"
+
+msgid "Not recommended"
+msgstr "Не рекомендуется"
+
+msgid "Custom"
+msgstr "Своя"
+
+msgid "Invalid port list; use ports or ranges like 1024-1934,1936-65535"
+msgstr "Неверный список портов; укажите порты или диапазоны, например 1024-1934,1936-65535"
+
+# ───────────── diagnostics (heli-zapret) ─────────────
+
+msgid "Unload WinDivert"
+msgstr "Выгрузить WinDivert"
+
+msgid "Remove services"
+msgstr "Удалить службы"
+
+msgid "Repair files"
+msgstr "Восстановить файлы"
+
+msgid "Clear Discord cache"
+msgstr "Очистить кэш Discord"
+
+msgid "Enable now"
+msgstr "Включить"
+
+msgid "The service is not running. zapret cannot work without it."
+msgstr "Служба не запущена. zapret без неё не работает."
+
+msgid "TCP timestamps"
+msgstr "TCP timestamps"
+
+msgid "Enabled automatically each time the bypass starts (required by several strategies)."
+msgstr "Включаются автоматически при каждом запуске обхода (нужны нескольким стратегиям)."
+
+msgid "AdGuard is running and may break Discord. See github.com/Flowseal/zapret-discord-youtube/issues/417"
+msgstr "Запущен AdGuard, он может ломать Discord. См. github.com/Flowseal/zapret-discord-youtube/issues/417"
+
+msgid "Not found."
+msgstr "Не найдено."
+
+msgid "Killer network services"
+msgstr "Сетевые службы Killer"
+
+msgid "Killer services conflict with zapret. See github.com/Flowseal/zapret-discord-youtube/issues/2512"
+msgstr "Службы Killer конфликтуют с zapret. См. github.com/Flowseal/zapret-discord-youtube/issues/2512"
+
+msgid "None running."
+msgstr "Не запущены."
+
+msgid "winws.exe is not running but the WinDivert driver is still loaded."
+msgstr "winws.exe не запущен, но драйвер WinDivert всё ещё загружен."
+
+msgid "No stale driver."
+msgstr "Зависших драйверов нет."
+
+msgid "Other bypass tools"
+msgstr "Другие средства обхода"
+
+msgid "No conflicting services."
+msgstr "Конфликтующих служб нет."
+
+msgid "Conflicting services installed: {}"
+msgstr "Конфликтующие службы установлены: {}"
+
+msgid "Installed and running."
+msgstr "Установлена и работает."
+
+msgid "Not installed."
+msgstr "Не установлена."
+
+msgid "Not enabled."
+msgstr "Не включён."
+
+msgid "winws.exe and the WinDivert driver match the bundled copies."
+msgstr "winws.exe и драйвер WinDivert совпадают со встроенными копиями."
+
+msgid "Engine files"
+msgstr "Файлы движка"
+
+msgid "Missing or modified files: {}"
+msgstr "Отсутствуют или изменены файлы: {}"
+
+msgid "Encrypted DNS (DoH) is configured in Windows."
+msgstr "В Windows настроен зашифрованный DNS (DoH)."
+
+msgid "Make sure secure DNS is set up in your browser with a non-default provider, or enable encrypted DNS in Windows 11 settings."
+msgstr "Настройте безопасный DNS в браузере с непровайдерским сервером или включите зашифрованный DNS в параметрах Windows 11."
+
+msgid "The hosts file has entries for youtube.com / youtu.be, which may break YouTube access."
+msgstr "В файле hosts есть записи для youtube.com / youtu.be, они могут ломать доступ к YouTube."
+
+msgid "No YouTube overrides."
+msgstr "Переопределений YouTube нет."
+
+msgid "WinDivert driver unloaded."
+msgstr "Драйвер WinDivert выгружен."
+
+msgid "Removed: {}."
+msgstr "Удалено: {}."
+
+msgid "TCP timestamps enabled."
+msgstr "TCP timestamps включены."
+
+msgid "netsh failed (run as administrator)."
+msgstr "Ошибка netsh (запустите от имени администратора)."
+
+msgid "APPDATA is not set."
+msgstr "Переменная APPDATA не задана."
+
+msgid "No Discord installation found."
+msgstr "Discord не найден."
+
+# ───────────── Telegram live dashboard ─────────────
+
+msgid "Live traffic"
+msgstr "Трафик в реальном времени"
+
+msgid "Download"
+msgstr "Загрузка"
+
+msgid "Upload"
+msgstr "Отдача"
+
+msgid "Peak {}"
+msgstr "Пик {}"
+
+msgid "Start the proxy to see live traffic."
+msgstr "Запустите прокси, чтобы видеть трафик."
+
+msgid "Connections"
+msgstr "Соединения"
+
+msgid "No open connections yet. Open Telegram to see them here."
+msgstr "Открытых соединений пока нет. Откройте Telegram, и они появятся здесь."
+
+msgid "The proxy is stopped."
+msgstr "Прокси остановлен."
+
+msgid "DC{} media"
+msgstr "DC{} медиа"
+
+msgid "Connecting"
+msgstr "Подключение"
+
+msgid "Direct WebSocket"
+msgstr "Прямой WebSocket"
+
+msgid "Cloudflare Worker"
+msgstr "Cloudflare Worker"
+
+msgid "TCP fallback"
+msgstr "Резервный TCP"
+
+msgid "HTTP/2 booster"
+msgstr "Ускоритель HTTP/2"
+
+msgid "Media booster (HTTP/2)"
+msgstr "Ускоритель медиа (HTTP/2)"
+
+msgid "Photos, videos and files on the Cloudflare route share fast HTTP/2 connections and download in parallel. Takes effect after Save."
+msgstr "Фото, видео и файлы через Cloudflare идут по общим быстрым HTTP/2-соединениям и качаются параллельно. Применяется после сохранения."
+
+# ───────────── user lists editor ─────────────
+
+msgid "Entries: {}"
+msgstr "Записей: {}"
+
+msgid "Empty"
+msgstr "Пусто"
+
+msgid "Has invalid lines"
+msgstr "Есть ошибки в строках"
+
+msgid "Line {}: “{}” is not a domain name."
+msgstr "Строка {}: «{}» — не доменное имя."
+
+msgid "Line {}: “{}” is not an address, network or range."
+msgstr "Строка {}: «{}» — не адрес, не сеть и не диапазон."
+
+msgid "({} more)"
+msgstr "(и ещё {})"
+
+msgid "One domain per line, for example example.com. Subdomains are included automatically."
+msgstr "Один домен на строку, например example.com. Поддомены учитываются автоматически."
+
+msgid "One entry per line: an address (1.2.3.4), a network (10.0.0.0/8) or a range (1.2.3.4-1.2.3.9)."
+msgstr "Одна запись на строку: адрес (1.2.3.4), сеть (10.0.0.0/8) или диапазон (1.2.3.4-1.2.3.9)."
+
+msgid "Lines starting with # are comments. Ctrl+S saves, Esc closes."
+msgstr "Строки с # — комментарии. Ctrl+S — сохранить, Esc — закрыть."
+
+# ───────────── route labels ─────────────
+
+msgid "Direct"
+msgstr "Напрямую"
+
+msgid "CF Worker"
+msgstr "CF Worker"
+
+msgid "HTTP/2"
+msgstr "HTTP/2"
+
+# ───────────── speed limit ─────────────
+
+msgid "Speed limit"
+msgstr "Лимит скорости"
+
+msgid "Unlimited"
+msgstr "Без лимита"
+
+# ───────────── strategy auto-builder ─────────────
+
+msgid "Auto-builder · BETA"
+msgstr "Автоподбор · BETA"
+
+msgid "Build ALT14"
+msgstr "Собрать ALT14"
+
+msgid "Builds a new strategy from “{}” for your connection."
+msgstr "Собирает новую стратегию из «{}» под ваше подключение."
+
+msgid "Select a strategy to build from."
+msgstr "Выберите стратегию, из которой собирать."
+
+msgid "Up to 20 variations (the web settings of every upstream strategy plus tweaks of the base) are tested on your real connection. The best is saved as general (ALT14). Takes about 10 minutes; the bypass pauses meanwhile and needs administrator rights."
+msgstr "До 20 вариантов (веб-настройки всех стратегий upstream и вариации базовой) проверяются на вашем реальном подключении. Лучший сохраняется как general (ALT14). Занимает около 10 минут; обход на это время приостанавливается, нужны права администратора."
+
+msgid "Saved as {} · {}"
+msgstr "Сохранено как {} · {}"
+
+msgid "No variation worked on this connection."
+msgstr "Ни один вариант не сработал на этом подключении."
+
+msgid "Pick a strategy other than general (ALT5) to build from."
+msgstr "Выберите для сборки стратегию, отличную от general (ALT5)."
+
+msgid "Auto-built"
+msgstr "Автоподбор"
+
+# ───────────── strategy studio ─────────────
+
+msgid "Studio"
+msgstr "Студия"
+
+msgid "Strategy Studio"
+msgstr "Студия стратегий"
+
+msgid "Find or build the strategy that works best on your connection, saved as customhelibypass."
+msgstr "Подберите или соберите стратегию, которая лучше всего работает на вашем подключении. Сохраняется как customhelibypass."
+
+msgid "Smart selection"
+msgstr "Умный подбор"
+
+msgid "Builds “customhelibypass” for your connection, starting from “{}”."
+msgstr "Собирает «customhelibypass» под ваше подключение, начиная с «{}»."
+
+msgid "Select a strategy to start from."
+msgstr "Выберите стратегию, с которой начать."
+
+msgid "Stage 1 screens the web settings of every upstream strategy. Stage 2 takes the three best and tries variations of them with every check: long downloads (the 16-20 KB freeze), Discord's gateway held open with heartbeats, its voice servers and media ports, and your own services. Stage 3 tests the two best again so luck does not decide. When results tie, the gentler strategy wins: fewer fake packets and less fragmentation keep long connections stable and draw less attention from the censor. Takes 5-10 minutes; the bypass pauses meanwhile."
+msgstr "Этап 1 быстро проверяет веб-настройки всех стратегий upstream. Этап 2 берёт три лучших и пробует их вариации со всеми проверками: длинные загрузки (заморозка на 16–20 КБ), шлюз Discord с удержанием соединения и heartbeat, его голосовые серверы и медиапорты, а также ваши сервисы. Этап 3 повторно проверяет двух лидеров, чтобы не решала случайность. При равенстве побеждает более мягкая стратегия: меньше фейковых пакетов и фрагментации — стабильнее долгие соединения и меньше внимания цензора. Занимает 5–10 минут; обход на это время приостанавливается."
+
+msgid "Start smart selection"
+msgstr "Запустить умный подбор"
+
+msgid "Use customhelibypass"
+msgstr "Выбрать customhelibypass"
+
+msgid "Show results"
+msgstr "Показать результаты"
+
+msgid "Build your own"
+msgstr "Собрать свою"
+
+msgid "Settings for ordinary web traffic (HTTP and HTTPS), plus QUIC and Discord voice. Everything else comes from “{}”."
+msgstr "Настройки для обычного веб-трафика (HTTP и HTTPS), а также QUIC и голоса Discord. Всё остальное берётся из «{}»."
+
+msgid "Technique"
+msgstr "Техника"
+
+msgid "Add fake packets"
+msgstr "Добавить фейковые пакеты"
+
+msgid "A decoy ClientHello before the real one."
+msgstr "Ложный ClientHello перед настоящим."
+
+msgid "Fake repeats"
+msgstr "Повторов фейка"
+
+msgid "Split position"
+msgstr "Позиция разреза"
+
+msgid "Overlap, bytes (0 = off)"
+msgstr "Перекрытие, байт (0 — выкл.)"
+
+msgid "Host shown in the fake part"
+msgstr "Хост в фейковой части"
+
+msgid "Fooling (how the fakes are made invisible to the server)"
+msgstr "Fooling (как фейки скрываются от сервера)"
+
+msgid "Fake ClientHello and overlap pattern"
+msgstr "Фейковый ClientHello и шаблон перекрытия"
+
+msgid "QUIC fake repeats"
+msgstr "Повторов фейка QUIC"
+
+msgid "Discord voice fake repeats"
+msgstr "Повторов фейка для голоса Discord"
+
+msgid "keep"
+msgstr "как есть"
+
+msgid "WEB PROFILE"
+msgstr "ВЕБ-ПРОФИЛЬ"
+
+msgid "Load from selected"
+msgstr "Загрузить из выбранной"
+
+msgid "Save as customhelibypass"
+msgstr "Сохранить как customhelibypass"
+
+msgid "Your services in the tests"
+msgstr "Ваши сервисы в тестах"
+
+msgid "Sites you care about, checked by every test next to Discord, YouTube and Cloudflare (the “Yours” column): a request plus a download of the address you enter."
+msgstr "Важные для вас сайты, которые каждый тест проверяет вместе с Discord, YouTube и Cloudflare (столбец «Свои»): запрос и загрузка указанного адреса."
+
+msgid "Name"
+msgstr "Название"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "YOURS"
+msgstr "СВОИ"
+
+msgid "Enter an https:// address, for example https://example.com"
+msgstr "Введите адрес https://, например https://example.com"
+
+msgid "This address is already in the list."
+msgstr "Этот адрес уже есть в списке."
+
+msgid "No strategy to start from."
+msgstr "Нет стратегии, с которой начать."
+
+msgid "Saved as {}"
+msgstr "Сохранено как {}"
+
+msgid "screening"
+msgstr "отбор"
+
+msgid "refining"
+msgstr "уточнение"
+
+msgid "confirming"
+msgstr "проверка"
+
+msgid "Stage {} of {}: {}"
+msgstr "Этап {} из {}: {}"
+
+msgid "Unknown method."
+msgstr "Неизвестный метод."
+
+msgid "Split position: use numbers or markers like 1, 2, sniext+1, midsld (comma separated)."
+msgstr "Позиция разреза: числа или метки вроде 1, 2, sniext+1, midsld (через запятую)."
+
+msgid "Overlap must be at most 2000 bytes."
+msgstr "Перекрытие — не больше 2000 байт."
+
+msgid "Unknown fooling method."
+msgstr "Неизвестный метод fooling."
+
+msgid "Unknown fake packet file."
+msgstr "Неизвестный файл фейкового пакета."
+
+msgid "The fake host must be a domain name."
+msgstr "Фейковый хост должен быть доменным именем."
+
+# ───────────── one-click mode ─────────────
+
+msgid "Set up the bypass in one click"
+msgstr "Настроить обход в один клик"
+
+msgid "Heli Bypass tries dozens of settings on your connection, keeps the one that works best for Discord, YouTube and other sites, and turns it on. You don't need to know anything about it. It takes about 5-10 minutes."
+msgstr "Heli Bypass перепробует десятки настроек на вашем подключении, оставит ту, что лучше всего работает для Discord, YouTube и других сайтов, и включит её. Ничего знать не нужно. Это займёт около 5–10 минут."
+
+msgid "Checking options on your connection… {}%"
+msgstr "Проверяем варианты на вашем подключении… {}%"
+
+msgid "Find and turn on"
+msgstr "Подобрать и включить"
+
+msgid "The bypass needs administrator rights."
+msgstr "Обходу нужны права администратора."
+
+msgid "Advanced mode"
+msgstr "Расширенный режим"
+
+msgid "Done! The bypass is on with your own strategy, customhelibypass."
+msgstr "Готово! Обход включён с вашей стратегией customhelibypass."
+
+# ───────────── about ─────────────
+
+msgid "Telegram channel"
+msgstr "Telegram-канал"
+
+msgid "Creator"
+msgstr "Автор"

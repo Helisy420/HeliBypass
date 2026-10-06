@@ -1,0 +1,469 @@
+import { Theme } from "theme.slint";
+
+// A recolourable SVG icon.
+export component Icon inherits Image {
+    in property <color> color: Theme.muted;
+    in property <length> size: 18px;
+    width: size;
+    height: size;
+    colorize: color;
+    image-fit: contain;
+}
+
+// Section label: a short accent bar followed by an upper-case caption.
+export component Eyebrow inherits HorizontalLayout {
+    in property <string> text;
+    spacing: 8px;
+    alignment: start;
+    Rectangle {
+        width: 16px;
+        height: 2px;
+        y: (parent.height - self.height) / 2;
+        background: Theme.accent;
+        border-radius: 1px;
+    }
+    Text {
+        text: root.text.to-uppercase();
+        color: Theme.accent;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        vertical-alignment: center;
+    }
+}
+
+export component Card inherits Rectangle {
+    background: Theme.surface;
+    border-radius: Theme.r-card;
+    border-width: 1px;
+    border-color: Theme.border;
+}
+
+// Page title + subtitle on the left, action widgets (children) on the right.
+export component PageHeader inherits HorizontalLayout {
+    in property <string> title;
+    in property <string> subtitle;
+    spacing: 16px;
+    VerticalLayout {
+        spacing: 6px;
+        alignment: start;
+        Text {
+            text: root.title;
+            color: Theme.text;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.6px;
+        }
+        Text {
+            text: root.subtitle;
+            color: Theme.muted;
+            font-size: 12.5px;
+            wrap: word-wrap;
+        }
+    }
+    HorizontalLayout {
+        spacing: 12px;
+        alignment: end;
+        @children
+    }
+}
+
+// Small status/label capsule.
+// tone: 0 neutral, 1 success, 2 warning, 3 danger, 4 accent (tinted), 5 chip (raised, accent text)
+export component Pill inherits Rectangle {
+    in property <string> text;
+    in property <int> tone: 0;
+    in property <bool> dot: true;
+    in property <bool> mono: false;
+    property <color> fg: tone == 1 ? Theme.success : tone == 2 ? Theme.amber : tone == 3 ? Theme.danger : (tone == 4 || tone == 5) ? Theme.accent : Theme.muted;
+    height: 24px;
+    horizontal-stretch: 0;
+    border-radius: 12px;
+    background: (tone == 0 || tone == 5) ? Theme.surface2 : fg.with-alpha(0.14);
+    HorizontalLayout {
+        padding-left: 10px;
+        padding-right: 10px;
+        spacing: 6px;
+        alignment: center;
+        if root.dot: Rectangle {
+            width: 5px;
+            height: 5px;
+            y: (parent.height - self.height) / 2;
+            border-radius: 3px;
+            background: root.fg;
+        }
+        Text {
+            text: root.text;
+            color: root.fg;
+            font-size: 11px;
+            font-weight: 500;
+            font-family: root.mono ? Theme.mono : Theme.sans;
+            vertical-alignment: center;
+        }
+    }
+}
+
+// kind: 0 primary, 1 secondary, 2 danger, 3 ghost
+export component Btn inherits Rectangle {
+    in property <string> text;
+    in property <image> icon;
+    in property <int> kind: 0;
+    in property <bool> enabled: true;
+    in property <length> pad: 18px;
+    in property <length> font-size: 14px;
+    callback clicked();
+    height: 44px;
+    border-radius: Theme.r-button;
+    opacity: enabled ? 1 : 0.45;
+    property <color> fg: kind == 0 ? Theme.bg : kind == 2 ? Theme.danger : Theme.text;
+    background: kind == 0 ? (ta.pressed ? Theme.accent-dark : ta.has-hover ? #8497E6 : Theme.accent)
+        : kind == 2 ? (ta.has-hover ? Theme.danger.with-alpha(0.22) : Theme.danger.with-alpha(0.12))
+        : kind == 3 ? (ta.has-hover ? Theme.surface2 : transparent)
+        : (ta.has-hover ? #1C2547 : Theme.surface2);
+    border-width: kind == 0 ? 0px : 1px;
+    border-color: kind == 2 ? Theme.danger.with-alpha(0.6) : kind == 3 ? transparent : Theme.border;
+    animate background { duration: 120ms; }
+    ta := TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+    HorizontalLayout {
+        padding-left: root.pad;
+        padding-right: root.pad;
+        spacing: 9px;
+        alignment: center;
+        if root.icon.width > 0: Icon {
+            source: root.icon;
+            color: root.fg;
+            size: root.font-size >= 14px ? 18px : 16px;
+            y: (parent.height - self.height) / 2;
+        }
+        Text {
+            text: root.text;
+            color: root.fg;
+            font-size: root.font-size;
+            font-weight: 500;
+            vertical-alignment: center;
+            overflow: elide;
+        }
+    }
+}
+
+// Stateless switch: it shows `checked` and reports the requested value through `toggled`;
+// the owner decides whether the state really changes. (Assigning `checked` from inside would
+// break a binding such as `checked: AppState.tg-running` after the first click.)
+export component Toggle inherits Rectangle {
+    in property <bool> checked;
+    in property <bool> enabled: true;
+    callback toggled(bool);
+    width: 44px;
+    height: 26px;
+    border-radius: 13px;
+    background: checked ? Theme.accent : Theme.surface2;
+    border-width: checked ? 0px : 1px;
+    border-color: Theme.border;
+    opacity: enabled ? 1 : 0.45;
+    animate background { duration: 140ms; }
+    Rectangle {
+        width: 20px;
+        height: 20px;
+        y: 3px;
+        x: root.checked ? parent.width - self.width - 3px : 3px;
+        border-radius: 10px;
+        background: root.checked ? Theme.bg : Theme.muted;
+        animate x { duration: 140ms; easing: ease-out; }
+    }
+    TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: pointer;
+        clicked => { root.toggled(!root.checked); }
+    }
+}
+
+export component CheckBox inherits Rectangle {
+    in-out property <bool> checked;
+    in property <string> label;
+    in property <image> check-icon;
+    callback toggled(bool);
+    height: 24px;
+    HorizontalLayout {
+        spacing: 12px;
+        alignment: start;
+        Rectangle {
+            width: 20px;
+            height: 20px;
+            y: (parent.height - self.height) / 2;
+            border-radius: 6px;
+            background: root.checked ? Theme.accent : Theme.surface2;
+            border-width: root.checked ? 0px : 1px;
+            border-color: Theme.border;
+            if root.checked: Icon {
+                source: root.check-icon;
+                color: Theme.bg;
+                size: 14px;
+                x: 3px;
+                y: 3px;
+            }
+        }
+        Text {
+            text: root.label;
+            color: Theme.text;
+            font-size: 14px;
+            font-weight: 500;
+            vertical-alignment: center;
+            overflow: elide;
+        }
+    }
+    TouchArea {
+        mouse-cursor: pointer;
+        clicked => {
+            root.checked = !root.checked;
+            root.toggled(root.checked);
+        }
+    }
+}
+
+// Single-line text input in the Helisy style.
+export component Field inherits Rectangle {
+    in-out property <string> text;
+    in property <string> placeholder;
+    in property <bool> mono: false;
+    in property <bool> read-only: false;
+    callback edited(string);
+    callback accepted(string);
+    height: 40px;
+    border-radius: Theme.r-input;
+    background: Theme.bg;
+    border-width: 1px;
+    border-color: ti.has-focus ? Theme.accent : Theme.border;
+    animate border-color { duration: 120ms; }
+    ti := TextInput {
+        x: 11px;
+        width: parent.width - 22px;
+        height: parent.height;
+        vertical-alignment: center;
+        text <=> root.text;
+        font-family: root.mono ? Theme.mono : Theme.sans;
+        font-size: root.mono ? 11.5px : 13px;
+        font-weight: 500;
+        color: Theme.text;
+        selection-background-color: Theme.accent.with-alpha(0.4);
+        selection-foreground-color: Theme.text;
+        read-only: root.read-only;
+        single-line: true;
+        edited => { root.edited(self.text); }
+        accepted => { root.accepted(self.text); }
+    }
+    if root.text == "": Text {
+        x: 11px;
+        text: root.placeholder;
+        color: Theme.dim;
+        font-size: 13px;
+        vertical-alignment: center;
+    }
+}
+
+// Multi-line input (list editors).
+export component Area inherits Rectangle {
+    in-out property <string> text;
+    in property <bool> mono: true;
+    callback edited(string);
+    border-radius: Theme.r-input;
+    background: Theme.bg;
+    border-width: 1px;
+    border-color: ti.has-focus ? Theme.accent : Theme.border;
+    animate border-color { duration: 120ms; }
+    ti := TextInput {
+        x: 14px;
+        y: 12px;
+        width: parent.width - 28px;
+        height: parent.height - 24px;
+        text <=> root.text;
+        wrap: word-wrap;
+        font-family: root.mono ? Theme.mono : Theme.sans;
+        font-size: 12.5px;
+        color: Theme.text;
+        selection-background-color: Theme.accent.with-alpha(0.4);
+        edited => { root.edited(self.text); }
+    }
+}
+
+export component ProgressBar inherits Rectangle {
+    in property <float> value; // 0..1
+    height: 8px;
+    border-radius: 4px;
+    background: Theme.bg;
+    Rectangle {
+        x: 0;
+        width: max(0px, min(parent.width, parent.width * root.value));
+        height: parent.height;
+        border-radius: 4px;
+        background: Theme.accent;
+        animate width { duration: 250ms; easing: ease-out; }
+    }
+}
+
+// Segmented control. `labels` are shown left to right; `current` is the selected index.
+export component Segmented inherits Rectangle {
+    in property <[string]> labels;
+    in-out property <int> current;
+    callback selected(int);
+    height: 38px;
+    min-width: 40px * labels.length;
+    border-radius: 12px;
+    background: Theme.bg;
+    border-width: 1px;
+    border-color: Theme.border;
+    HorizontalLayout {
+        padding: 3px;
+        spacing: 2px;
+        for label[i] in root.labels: Rectangle {
+            horizontal-stretch: 1;
+            min-width: 0px;
+            border-radius: 9px;
+            background: root.current == i ? Theme.surface2 : transparent;
+            animate background { duration: 120ms; }
+            // width bound to the cell so label length never skews the column widths
+            Text {
+                width: parent.width;
+                height: parent.height;
+                text: label;
+                color: root.current == i ? Theme.accent : Theme.muted;
+                font-size: 12.5px;
+                font-weight: 500;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                overflow: elide;
+            }
+            TouchArea {
+                mouse-cursor: pointer;
+                clicked => {
+                    root.current = i;
+                    root.selected(i);
+                }
+            }
+        }
+    }
+}
+
+// Round status glyph used in the results table: 0 pending, 1 ok, 2 partial, 3 fail
+export component StateGlyph inherits Rectangle {
+    in property <int> state;
+    in property <image> ok-icon;
+    in property <image> fail-icon;
+    in property <image> minus-icon;
+    in property <image> clock-icon;
+    // 4 = not tested (nothing in this group)
+    property <color> tint: state == 1 ? Theme.success : state == 2 ? Theme.amber : state == 3 ? Theme.danger : Theme.dim;
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    background: (state == 0 || state == 4) ? Theme.surface2 : tint.with-alpha(0.16);
+    opacity: state == 4 ? 0.5 : 1;
+    Icon {
+        source: root.state == 1 ? root.ok-icon : (root.state == 2 || root.state == 4) ? root.minus-icon : root.state == 3 ? root.fail-icon : root.clock-icon;
+        color: root.tint;
+        size: 14px;
+        x: 5px;
+        y: 5px;
+    }
+}
+
+// Vertical scroll container with a slim overlay scrollbar.
+export component Scroller inherits Rectangle {
+    in property <length> content-height;
+    out property <length> content-y <=> fl.content-y;
+    clip: true;
+    // Wheel/trackpad scrolling. The TouchArea is the Flickable's *parent*: children see every
+    // event first, so buttons inside stay clickable, and wheel events they ignore bubble up here.
+    // (As a sibling drawn on top it would grab every mouse press and swallow all clicks.)
+    TouchArea {
+        scroll-event(e) => {
+            if (root.content-height <= root.height) {
+                return reject;
+            }
+            fl.content-y = max(root.height - root.content-height, min(0px, fl.content-y + e.delta-y));
+            accept
+        }
+        fl := Flickable {
+            content-height: max(root.content-height, root.height);
+            content-width: root.width;
+            interactive: false;
+            @children
+        }
+    }
+    if root.content-height > root.height: Rectangle {
+        x: parent.width - 6px;
+        y: 4px + (parent.height - 8px - self.height) * (-fl.content-y / (root.content-height - root.height));
+        width: 4px;
+        height: max(36px, (parent.height - 8px) * parent.height / root.content-height);
+        border-radius: 2px;
+        background: Theme.border;
+    }
+}
+
+// Multi-line, scrollable, monospace text editor (one entry per line; used for the user lists).
+export component CodeEditor inherits Rectangle {
+    in-out property <string> text;
+    callback edited(string);
+    // focus with the caret after the last entry (lists are ASCII, so characters = bytes)
+    public function focus-editor() {
+        ti.focus();
+        ti.set-selection-offsets(ti.text.character-count, ti.text.character-count);
+    }
+    border-radius: Theme.r-input;
+    background: Theme.bg;
+    border-width: 1px;
+    border-color: ti.has-focus ? Theme.accent : Theme.border;
+    animate border-color { duration: 120ms; }
+    clip: true;
+    // wheel scrolling; the TouchArea is the parent so the text input still gets every click
+    TouchArea {
+        mouse-cursor: MouseCursor.text;
+        clicked => { ti.focus(); }
+        scroll-event(e) => {
+            if (fl.content-height <= fl.height) {
+                return reject;
+            }
+            fl.content-y = max(fl.height - fl.content-height, min(0px, fl.content-y + e.delta-y));
+            accept
+        }
+        fl := Flickable {
+            interactive: false;
+            content-width: self.width;
+            content-height: max(ti.preferred-height + 24px, self.height);
+            ti := TextInput {
+                x: 14px;
+                y: 12px;
+                width: parent.width - 28px;
+                height: max(self.preferred-height, fl.height - 24px);
+                text <=> root.text;
+                single-line: false;
+                wrap: no-wrap;
+                font-family: Theme.mono;
+                font-size: 12.5px;
+                color: Theme.text;
+                selection-background-color: Theme.accent.with-alpha(0.4);
+                selection-foreground-color: Theme.text;
+                edited => { root.edited(self.text); }
+                // keep the caret in view while typing or moving with the keyboard
+                cursor-position-changed(pos) => {
+                    if (12px + pos.y + fl.content-y < 0) {
+                        fl.content-y = min(0px, -pos.y);
+                    } else if (12px + pos.y + 20px + fl.content-y > fl.height) {
+                        fl.content-y = max(fl.height - fl.content-height, fl.height - pos.y - 20px - 24px);
+                    }
+                }
+            }
+        }
+    }
+    if fl.content-height > fl.height: Rectangle {
+        x: parent.width - 6px;
+        y: 4px + (parent.height - 8px - self.height) * (-fl.content-y / (fl.content-height - fl.height));
+        width: 4px;
+        height: max(36px, (parent.height - 8px) * parent.height / fl.content-height);
+        border-radius: 2px;
+        background: Theme.border;
+    }
+}

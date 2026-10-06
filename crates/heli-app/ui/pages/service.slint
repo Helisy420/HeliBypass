@@ -1,0 +1,159 @@
+import { Theme } from "../theme.slint";
+import { Card, Pill, Btn, Icon, Eyebrow, PageHeader } from "../components.slint";
+import { AppState } from "../state.slint";
+import { Icons } from "../icons.slint";
+
+component Fact inherits VerticalLayout {
+    in property <string> label;
+    in property <string> value;
+    in property <bool> mono: false;
+    spacing: 4px;
+    Text {
+        text: root.label.to-uppercase();
+        color: Theme.dim;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+    Text {
+        text: root.value == "" ? "—" : root.value;
+        color: Theme.text;
+        font-size: 13.5px;
+        font-weight: 500;
+        font-family: root.mono ? Theme.mono : Theme.sans;
+        overflow: elide;
+    }
+}
+
+export component ServicePage inherits Rectangle {
+    VerticalLayout {
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-top: 22px;
+        padding-bottom: 22px;
+        spacing: 18px;
+        alignment: start;
+
+        PageHeader {
+            title: @tr("Service");
+            subtitle: @tr("Install the bypass as a Windows service so it starts with the system.");
+        }
+
+        Card {
+            height: 252px;
+            VerticalLayout {
+                padding: 24px;
+                spacing: 20px;
+                HorizontalLayout {
+                    spacing: 16px;
+                    Rectangle {
+                        width: 56px;
+                        height: 56px;
+                        border-radius: 28px;
+                        background: Theme.surface2;
+                        border-width: 1.5px;
+                        border-color: AppState.svc-installed ? Theme.amber.with-alpha(0.65) : Theme.border;
+                        Icon {
+                            source: Icons.server;
+                            color: AppState.svc-installed ? Theme.accent : Theme.dim;
+                            size: 24px;
+                            x: 16px;
+                            y: 16px;
+                        }
+                    }
+                    VerticalLayout {
+                        horizontal-stretch: 1;
+                        alignment: center;
+                        spacing: 6px;
+                        Text {
+                            text: @tr("zapret service");
+                            color: Theme.text;
+                            font-size: 18px;
+                            font-weight: 600;
+                        }
+                        Text {
+                            text: @tr("Runs the bypass at system start, before you sign in. No app window and no UAC prompt needed.");
+                            color: Theme.muted;
+                            font-size: 12.5px;
+                            wrap: word-wrap;
+                        }
+                    }
+                    VerticalLayout {
+                        alignment: start;
+                        horizontal-stretch: 0;
+                        padding-top: 6px;
+                        HorizontalLayout {
+                            alignment: end;
+                            Pill {
+                                text: AppState.svc-state;
+                                tone: AppState.svc-tone;
+                            }
+                        }
+                    }
+                }
+                Rectangle {
+                    height: 1px;
+                    background: Theme.border;
+                }
+                HorizontalLayout {
+                    spacing: 24px;
+                    Fact {
+                        horizontal-stretch: 1;
+                        label: @tr("Installed strategy");
+                        value: AppState.svc-strategy;
+                    }
+                    Fact {
+                        horizontal-stretch: 1;
+                        label: @tr("Selected strategy");
+                        value: AppState.bp-strategy;
+                    }
+                    Fact {
+                        horizontal-stretch: 1;
+                        label: @tr("WinDivert driver");
+                        value: AppState.svc-driver;
+                    }
+                }
+                HorizontalLayout {
+                    spacing: 12px;
+                    alignment: start;
+                    Btn {
+                        text: AppState.svc-installed ? @tr("Reinstall with ") + AppState.bp-strategy : @tr("Install service");
+                        icon: Icons.power;
+                        enabled: !AppState.svc-busy;
+                        clicked => { AppState.svc-install(); }
+                    }
+                    Btn {
+                        kind: 2;
+                        text: @tr("Remove service");
+                        icon: Icons.x;
+                        enabled: AppState.svc-installed && !AppState.svc-busy;
+                        clicked => { AppState.svc-remove(); }
+                    }
+                }
+            }
+        }
+
+        Card {
+            height: 84px;
+            background: Theme.amber.with-alpha(0.06);
+            border-color: Theme.amber.with-alpha(0.35);
+            HorizontalLayout {
+                padding: 18px;
+                spacing: 14px;
+                Icon {
+                    source: Icons.info;
+                    color: Theme.amber;
+                    y: 2px;
+                }
+                Text {
+                    horizontal-stretch: 1;
+                    text: @tr("The service and the in-app bypass use the same WinDivert driver, so only one can run at a time. While the service is installed, the in-app Start button and strategy tests are disabled. Remove the service to use them.");
+                    color: Theme.muted;
+                    font-size: 12.5px;
+                    wrap: word-wrap;
+                    vertical-alignment: top;
+                }
+            }
+        }
+    }
+}

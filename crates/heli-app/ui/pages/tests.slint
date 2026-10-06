@@ -1,0 +1,273 @@
+import { Theme } from "../theme.slint";
+import { Card, Pill, Btn, Icon, Eyebrow, PageHeader, Segmented, ProgressBar, StateGlyph, Scroller } from "../components.slint";
+import { AppState, TestRow } from "../state.slint";
+import { Icons } from "../icons.slint";
+
+// Equal-width column header (a Rectangle, so text length does not skew the column widths)
+component HeadCell inherits Rectangle {
+    in property <string> text;
+    in property <bool> left: false;
+    horizontal-stretch: 1;
+    Text {
+        width: parent.width;
+        text: root.text;
+        color: Theme.dim;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 1.2px;
+        horizontal-alignment: root.left ? TextHorizontalAlignment.left : TextHorizontalAlignment.center;
+        vertical-alignment: center;
+    }
+}
+
+component Glyph inherits Rectangle {
+    in property <int> state;
+    horizontal-stretch: 1;
+    StateGlyph {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        state: root.state;
+        ok-icon: Icons.check;
+        fail-icon: Icons.x;
+        minus-icon: Icons.minus;
+        clock-icon: Icons.clock;
+    }
+}
+
+component Cell inherits Rectangle {
+    in property <string> text;
+    in property <color> fg: Theme.muted;
+    horizontal-stretch: 1;
+    Text {
+        text: root.text;
+        color: root.fg;
+        font-size: 12px;
+        font-family: Theme.mono;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
+
+component ResultRow inherits Rectangle {
+    in property <TestRow> data;
+    in property <bool> dpi: false;
+    height: 52px;
+    border-radius: 12px;
+    background: data.best ? Theme.accent.with-alpha(0.06) : transparent;
+    border-width: data.best ? 1px : 0px;
+    border-color: Theme.accent.with-alpha(0.7);
+    HorizontalLayout {
+        padding-left: 12px;
+        padding-right: 12px;
+        HorizontalLayout {
+            horizontal-stretch: 0;
+            min-width: 260px;
+            max-width: 260px;
+            spacing: 10px;
+            Text {
+                text: data.name;
+                color: data.error != "" ? Theme.danger : Theme.text;
+                font-size: 13px;
+                font-weight: 500;
+                vertical-alignment: center;
+                overflow: elide;
+                horizontal-stretch: 0;
+            }
+            if data.best: VerticalLayout {
+                alignment: center;
+                Pill {
+                    text: @tr("Best");
+                    tone: 4;
+                }
+            }
+            if data.running: VerticalLayout {
+                alignment: center;
+                Pill {
+                    text: @tr("Testing");
+                    tone: 2;
+                }
+            }
+        }
+        if !root.dpi: Glyph { state: data.g0; }
+        if !root.dpi: Glyph { state: data.g1; }
+        if !root.dpi: Glyph { state: data.g2; }
+        if !root.dpi: Glyph { state: data.g3; }
+        if root.dpi: Cell { text: data.d0; fg: Theme.success; }
+        if root.dpi: Cell { text: data.d1; fg: Theme.danger; }
+        if root.dpi: Cell { text: data.d2; fg: Theme.muted; }
+        Cell {
+            width: 70px;
+            horizontal-stretch: 0;
+            text: data.score;
+            fg: data.score.starts-with("4") && !root.dpi ? Theme.success : Theme.muted;
+        }
+    }
+}
+
+export component TestsPage inherits Rectangle {
+    VerticalLayout {
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-top: 22px;
+        padding-bottom: 20px;
+        spacing: 16px;
+
+        PageHeader {
+            title: @tr("Run tests");
+            subtitle: @tr("Checks every strategy against your real connection and ranks them.");
+            Btn {
+                kind: 1;
+                text: @tr("Stop");
+                icon: Icons.x;
+                enabled: AppState.test-running;
+                clicked => { AppState.tests-stop(); }
+            }
+            Btn {
+                text: @tr("Run all configs");
+                icon: Icons.play;
+                enabled: !AppState.test-running;
+                clicked => { AppState.tests-run-all(); }
+            }
+        }
+
+        HorizontalLayout {
+            alignment: start;
+            Segmented {
+                width: 320px;
+                labels: [@tr("Standard tests"), @tr("DPI checkers")];
+                current: AppState.test-tab;
+                selected(i) => { AppState.tests-switch-tab(i); }
+            }
+        }
+
+        if AppState.test-error != "": Card {
+            height: 48px;
+            background: Theme.danger.with-alpha(0.10);
+            border-color: Theme.danger.with-alpha(0.5);
+            HorizontalLayout {
+                padding: 14px;
+                spacing: 10px;
+                Icon {
+                    source: Icons.alert;
+                    color: Theme.danger;
+                    y: (parent.height - self.height) / 2;
+                }
+                Text {
+                    text: AppState.test-error;
+                    color: Theme.danger;
+                    font-size: 12px;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+            }
+        }
+
+        Card {
+            height: 92px;
+            VerticalLayout {
+                padding: 18px;
+                padding-left: 20px;
+                padding-right: 20px;
+                spacing: 10px;
+                Eyebrow {
+                    text: @tr("Progress");
+                    height: 18px;
+                }
+                HorizontalLayout {
+                    Text {
+                        text: AppState.test-label;
+                        color: Theme.text;
+                        font-size: 14px;
+                        font-weight: 600;
+                        horizontal-stretch: 1;
+                        overflow: elide;
+                    }
+                    Text {
+                        text: AppState.test-count;
+                        color: Theme.muted;
+                        font-size: 12px;
+                        font-family: Theme.mono;
+                    }
+                }
+                ProgressBar { value: AppState.test-progress; }
+            }
+        }
+
+        Card {
+            vertical-stretch: 1;
+            VerticalLayout {
+                padding: 18px;
+                padding-left: 20px;
+                padding-right: 20px;
+                padding-bottom: 10px;
+                spacing: 8px;
+                Eyebrow {
+                    text: @tr("Results");
+                    height: 18px;
+                }
+                HorizontalLayout {
+                    height: 22px;
+                    padding-left: 12px;
+                    padding-right: 12px;
+                    HeadCell {
+                        text: @tr("STRATEGY");
+                        left: true;
+                        width: 260px;
+                        horizontal-stretch: 0;
+                    }
+                    if AppState.test-tab != 1: HeadCell { text: "DISCORD"; horizontal-stretch: 1; }
+                    if AppState.test-tab != 1: HeadCell { text: "YOUTUBE"; horizontal-stretch: 1; }
+                    if AppState.test-tab != 1: HeadCell { text: "CLOUDFLARE"; horizontal-stretch: 1; }
+                    if AppState.test-tab != 1: HeadCell { text: @tr("YOURS"); horizontal-stretch: 1; }
+                    if AppState.test-tab == 1: HeadCell { text: @tr("PASSED"); horizontal-stretch: 1; }
+                    if AppState.test-tab == 1: HeadCell { text: @tr("FROZEN"); horizontal-stretch: 1; }
+                    if AppState.test-tab == 1: HeadCell { text: @tr("FAILED"); horizontal-stretch: 1; }
+                    HeadCell {
+                        text: @tr("SCORE");
+                        width: 70px;
+                        horizontal-stretch: 0;
+                    }
+                }
+                Scroller {
+                    vertical-stretch: 1;
+                    content-height: AppState.test-rows.length * 54px;
+                    VerticalLayout {
+                        spacing: 2px;
+                        alignment: start;
+                        for r in AppState.test-rows: ResultRow {
+                            data: r;
+                            dpi: AppState.test-tab == 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 12px;
+            height: 46px;
+            Btn {
+                text: AppState.test-best != "" ? @tr("Use “{}”", AppState.test-best) : @tr("Use best strategy");
+                icon: Icons.check;
+                enabled: AppState.test-best != "";
+                clicked => { AppState.tests-use-best(); }
+            }
+            Btn {
+                kind: 1;
+                text: @tr("Export results");
+                icon: Icons.download;
+                enabled: AppState.test-best != "" || AppState.test-rows.length > 0;
+                clicked => { AppState.tests-export(); }
+            }
+            Text {
+                horizontal-stretch: 1;
+                text: AppState.test-footer;
+                color: Theme.dim;
+                font-size: 11px;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                overflow: elide;
+            }
+        }
+    }
+}

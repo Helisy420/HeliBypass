@@ -1,0 +1,296 @@
+import { Theme } from "../theme.slint";
+import { Card, Pill, Btn, Icon, Eyebrow, PageHeader, Segmented, Field, Scroller } from "../components.slint";
+import { AppState } from "../state.slint";
+import { Icons } from "../icons.slint";
+
+component Hint inherits Text {
+    color: Theme.muted;
+    font-size: 12px;
+    wrap: word-wrap;
+}
+
+component FileRow inherits Rectangle {
+    in property <string> title;
+    in property <string> sub;
+    callback edit();
+    height: 54px;
+    HorizontalLayout {
+        spacing: 12px;
+        VerticalLayout {
+            horizontal-stretch: 1;
+            alignment: center;
+            spacing: 3px;
+            Text {
+                text: root.title;
+                color: Theme.text;
+                font-size: 13px;
+                overflow: elide;
+            }
+            Text {
+                text: root.sub;
+                color: Theme.dim;
+                font-size: 11px;
+                overflow: elide;
+            }
+        }
+        VerticalLayout {
+            alignment: center;
+            horizontal-stretch: 0;
+            Btn {
+                kind: 1;
+                height: 34px;
+                pad: 14px;
+                font-size: 13px;
+                text: @tr("Edit");
+                icon: Icons.file;
+                clicked => { root.edit(); }
+            }
+        }
+    }
+}
+
+component IpsetCard inherits Card {
+    height: 204px;
+    VerticalLayout {
+        padding: 18px;
+        padding-left: 20px;
+        padding-right: 20px;
+        spacing: 12px;
+        Eyebrow {
+            text: @tr("IPSet filter");
+            height: 20px;
+        }
+        Segmented {
+            labels: [@tr("None"), @tr("Loaded"), @tr("Any")];
+            current: AppState.ipset-mode;
+            selected(i) => { AppState.ipset-set(i); }
+        }
+        Hint {
+            vertical-stretch: 1;
+            text: AppState.ipset-mode == 0 ? @tr("None: only the domain lists apply. Safest; try this first.") : AppState.ipset-mode == 1 ? @tr("Loaded: the bypass also covers every address in the IP list (Discord, YouTube, games).") : @tr("Any: the bypass touches every address. Needed for DPI tests; may break other sites.");
+        }
+        HorizontalLayout {
+            spacing: 12px;
+            Btn {
+                kind: 1;
+                height: 38px;
+                text: AppState.ipset-busy ? @tr("Updating…") : @tr("Update list");
+                icon: Icons.refresh;
+                enabled: !AppState.ipset-busy;
+                clicked => { AppState.ipset-update(); }
+            }
+            Text {
+                horizontal-stretch: 1;
+                text: AppState.ipset-info;
+                color: Theme.dim;
+                font-size: 11.5px;
+                vertical-alignment: center;
+                overflow: elide;
+            }
+        }
+    }
+}
+
+component PortField inherits VerticalLayout {
+    in property <string> label;
+    in-out property <string> value;
+    in property <bool> locked;
+    horizontal-stretch: 1;
+    spacing: 6px;
+    Text {
+        text: root.label;
+        color: Theme.muted;
+        font-size: 12px;
+    }
+    Field {
+        text <=> root.value;
+        mono: true;
+        read-only: root.locked;
+        opacity: root.locked ? 0.5 : 1;
+    }
+}
+
+component GameCard inherits Card {
+    height: 268px;
+    VerticalLayout {
+        padding: 18px;
+        padding-left: 20px;
+        padding-right: 20px;
+        spacing: 12px;
+        Eyebrow {
+            text: @tr("Game filter");
+            height: 20px;
+        }
+        Segmented {
+            labels: [@tr("Off"), @tr("TCP + UDP"), @tr("TCP"), @tr("UDP")];
+            current: AppState.game-mode;
+            selected(i) => { AppState.game-mode = i; }
+        }
+        HorizontalLayout {
+            spacing: 12px;
+            PortField {
+                label: @tr("TCP ports");
+                value <=> AppState.game-tcp;
+                locked: AppState.game-mode == 0 || AppState.game-mode == 3;
+            }
+            PortField {
+                label: @tr("UDP ports");
+                value <=> AppState.game-udp;
+                locked: AppState.game-mode == 0 || AppState.game-mode == 2;
+            }
+        }
+        Text {
+            vertical-stretch: 1;
+            text: AppState.game-error != "" ? AppState.game-error : @tr("Example: 1024-1934,1936-65535. Restart the bypass after applying.");
+            color: AppState.game-error != "" ? Theme.danger : Theme.dim;
+            font-size: 11.5px;
+            wrap: word-wrap;
+        }
+        HorizontalLayout {
+            alignment: start;
+            Btn {
+                height: 38px;
+                text: @tr("Apply");
+                icon: Icons.check;
+                clicked => { AppState.game-apply(); }
+            }
+        }
+    }
+}
+
+component HostsCard inherits Card {
+    height: 222px;
+    VerticalLayout {
+        padding: 18px;
+        padding-left: 20px;
+        padding-right: 20px;
+        spacing: 12px;
+        HorizontalLayout {
+            Eyebrow {
+                text: @tr("Hosts file");
+                height: 24px;
+                horizontal-stretch: 1;
+            }
+            Pill {
+                text: AppState.hosts-state;
+                tone: AppState.hosts-tone;
+            }
+        }
+        Hint {
+            vertical-stretch: 1;
+            text: @tr("Some services are reachable only with extra entries in the Windows hosts file. HeliBypass adds them as one clearly marked block and keeps a backup of your original file.");
+        }
+        HorizontalLayout {
+            spacing: 12px;
+            alignment: start;
+            Btn {
+                height: 38px;
+                text: AppState.hosts-busy ? @tr("Working…") : @tr("Update hosts");
+                icon: Icons.download;
+                enabled: !AppState.hosts-busy;
+                clicked => { AppState.hosts-update(); }
+            }
+            Btn {
+                kind: 1;
+                height: 38px;
+                text: @tr("Remove block");
+                enabled: !AppState.hosts-busy;
+                clicked => { AppState.hosts-restore(); }
+            }
+        }
+    }
+}
+
+component ListsCard inherits Card {
+    height: 236px;
+    VerticalLayout {
+        padding: 18px;
+        padding-left: 20px;
+        padding-right: 20px;
+        spacing: 4px;
+        Eyebrow {
+            text: @tr("Your lists");
+            height: 20px;
+        }
+        FileRow {
+            title: @tr("Extra domains to bypass");
+            sub: AppState.list-counts[0];
+            edit => { AppState.list-open(0); }
+        }
+        Rectangle {
+            height: 1px;
+            background: Theme.border;
+        }
+        FileRow {
+            title: @tr("Domains to leave alone");
+            sub: AppState.list-counts[1];
+            edit => { AppState.list-open(1); }
+        }
+        Rectangle {
+            height: 1px;
+            background: Theme.border;
+        }
+        FileRow {
+            title: @tr("Addresses to leave alone");
+            sub: AppState.list-counts[2];
+            edit => { AppState.list-open(2); }
+        }
+    }
+}
+
+export component IpsetPage inherits Rectangle {
+    property <bool> wide: root.width >= 860px;
+
+    VerticalLayout {
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-top: 22px;
+        padding-bottom: 20px;
+        spacing: 18px;
+
+        PageHeader {
+            title: @tr("IPSet & Hosts");
+            subtitle: @tr("Which addresses the bypass touches, plus game traffic and the hosts file.");
+        }
+
+        sc := Scroller {
+            vertical-stretch: 1;
+            content-height: body.preferred-height + 8px;
+            body := VerticalLayout {
+                // pinned: inside the Flickable a layout would otherwise take its preferred width
+                width: sc.width;
+                padding-right: 10px;
+                alignment: start;
+
+                if root.wide: HorizontalLayout {
+                    spacing: 16px;
+                    // explicit equal widths: card contents must not decide the column widths
+                    VerticalLayout {
+                        horizontal-stretch: 0;
+                        width: (root.width - 48px - 10px - 16px) / 2;
+                        spacing: 14px;
+                        alignment: start;
+                        IpsetCard { }
+                        GameCard { }
+                    }
+                    VerticalLayout {
+                        horizontal-stretch: 0;
+                        width: (root.width - 48px - 10px - 16px) / 2;
+                        spacing: 14px;
+                        alignment: start;
+                        HostsCard { }
+                        ListsCard { }
+                    }
+                }
+
+                if !root.wide: VerticalLayout {
+                    spacing: 14px;
+                    IpsetCard { }
+                    GameCard { }
+                    HostsCard { }
+                    ListsCard { }
+                }
+            }
+        }
+    }
+}

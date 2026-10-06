@@ -1,0 +1,769 @@
+import { Theme } from "../theme.slint";
+import { Card, Pill, Btn, Icon, Eyebrow, PageHeader, Field, Area, CheckBox, Scroller, Toggle } from "../components.slint";
+import { AppState } from "../state.slint";
+import { Icons } from "../icons.slint";
+
+component RouteNode inherits VerticalLayout {
+    in property <image> glyph;
+    in property <string> label;
+    in property <bool> lit: false;
+    spacing: 8px;
+    alignment: start;
+    horizontal-stretch: 1;
+    HorizontalLayout {
+        alignment: center;
+        Rectangle {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: root.lit ? Theme.accent.with-alpha(0.14) : Theme.surface2;
+            border-width: 1px;
+            border-color: root.lit ? Theme.accent : Theme.border;
+            Icon {
+                source: root.glyph;
+                color: root.lit ? Theme.accent : Theme.muted;
+                size: 20px;
+                x: 14px;
+                y: 14px;
+            }
+        }
+    }
+    Text {
+        text: root.label;
+        color: Theme.muted;
+        font-size: 11.5px;
+        horizontal-alignment: center;
+        wrap: word-wrap;
+    }
+}
+
+component Arrow inherits VerticalLayout {
+    alignment: start;
+    padding-top: 14px;
+    horizontal-stretch: 0;
+    Icon {
+        source: Icons.arrow-right;
+        color: Theme.dim;
+        size: 16px;
+    }
+}
+
+component Label inherits Text {
+    color: Theme.muted;
+    font-size: 12px;
+}
+
+component StatusCard inherits Card {
+    height: 158px;
+    VerticalLayout {
+        padding: 20px;
+        spacing: 16px;
+        HorizontalLayout {
+            spacing: 16px;
+            Rectangle {
+                width: 64px;
+                height: 64px;
+                border-radius: 32px;
+                background: Theme.surface2;
+                border-width: 2px;
+                border-color: AppState.tg-running ? Theme.amber.with-alpha(0.75) : Theme.border;
+                Icon {
+                    source: AppState.tg-running ? Icons.shield : Icons.power;
+                    color: AppState.tg-running ? Theme.accent : Theme.dim;
+                    size: 28px;
+                    x: 18px;
+                    y: 18px;
+                }
+            }
+            VerticalLayout {
+                horizontal-stretch: 1;
+                alignment: center;
+                spacing: 8px;
+                Text {
+                    text: AppState.tg-busy ? @tr("Starting…") : AppState.tg-running ? @tr("Proxy is running") : @tr("Proxy is stopped");
+                    color: Theme.text;
+                    font-size: 22px;
+                    font-weight: 600;
+                    letter-spacing: -0.4px;
+                    overflow: elide;
+                }
+                HorizontalLayout {
+                    alignment: start;
+                    Pill {
+                        text: AppState.tg-addr;
+                        tone: AppState.tg-running ? 1 : 0;
+                        mono: true;
+                    }
+                }
+            }
+            VerticalLayout {
+                alignment: start;
+                horizontal-stretch: 0;
+                Btn {
+                    kind: AppState.tg-running ? 2 : 0;
+                    text: AppState.tg-running ? @tr("Stop") : @tr("Start");
+                    icon: AppState.tg-running ? Icons.x : Icons.play;
+                    enabled: !AppState.tg-busy;
+                    height: 42px;
+                    pad: 20px;
+                    clicked => { AppState.tg-toggle(); }
+                }
+            }
+        }
+        HorizontalLayout {
+            spacing: 10px;
+            Btn {
+                horizontal-stretch: 1;
+                text: @tr("Open in Telegram");
+                icon: Icons.send;
+                enabled: AppState.tg-running;
+                clicked => { AppState.tg-open(); }
+            }
+            Btn {
+                horizontal-stretch: 1;
+                kind: 1;
+                text: @tr("Copy tg:// link");
+                icon: Icons.link;
+                enabled: AppState.tg-running;
+                clicked => { AppState.tg-copy-link(); }
+            }
+        }
+    }
+}
+
+component RouteCard inherits Card {
+    height: 170px;
+    VerticalLayout {
+        padding: 18px;
+        padding-left: 20px;
+        padding-right: 20px;
+        spacing: 12px;
+        Eyebrow {
+            text: @tr("Route");
+            height: 20px;
+        }
+        HorizontalLayout {
+            spacing: 4px;
+            RouteNode {
+                glyph: Icons.monitor;
+                label: @tr("Client");
+            }
+            Arrow { }
+            RouteNode {
+                glyph: Icons.shield;
+                label: @tr("Local proxy");
+                lit: AppState.tg-running;
+            }
+            Arrow { }
+            RouteNode {
+                glyph: Icons.cloud;
+                label: AppState.tg-cf ? @tr("Cloudflare") : @tr("WebSocket");
+                lit: AppState.tg-running;
+            }
+            Arrow { }
+            RouteNode {
+                glyph: Icons.send;
+                label: @tr("Telegram");
+            }
+        }
+        Text {
+            text: AppState.tg-route-note;
+            color: Theme.dim;
+            font-size: 11.5px;
+            wrap: word-wrap;
+        }
+    }
+}
+
+component Beta inherits Rectangle {
+    width: 44px;
+    height: 20px;
+    border-radius: 10px;
+    background: Theme.amber.with-alpha(0.14);
+    border-width: 1px;
+    border-color: Theme.amber.with-alpha(0.45);
+    Text {
+        width: parent.width;
+        height: parent.height;
+        text: "BETA";
+        color: Theme.amber;
+        font-size: 9.5px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
+
+component Rate inherits HorizontalLayout {
+    in property <image> glyph;
+    in property <string> label;
+    in property <string> value;
+    in property <color> tint;
+    spacing: 10px;
+    Rectangle {
+        width: 34px;
+        height: 34px;
+        y: (parent.height - self.height) / 2;
+        border-radius: 10px;
+        background: root.tint.with-alpha(0.14);
+        Icon {
+            source: root.glyph;
+            color: root.tint;
+            size: 16px;
+            x: 9px;
+            y: 9px;
+        }
+    }
+    VerticalLayout {
+        alignment: center;
+        spacing: 1px;
+        Text {
+            text: root.label.to-uppercase();
+            color: Theme.dim;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+        Text {
+            text: root.value;
+            color: Theme.text;
+            font-size: 20px;
+            font-weight: 600;
+        }
+    }
+}
+
+component MiniStat inherits HorizontalLayout {
+    in property <string> label;
+    in property <string> value;
+    in property <color> value-color: Theme.text;
+    spacing: 6px;
+    Text {
+        text: root.label;
+        color: Theme.dim;
+        font-size: 11.5px;
+        vertical-alignment: center;
+    }
+    Text {
+        text: root.value;
+        color: root.value-color;
+        font-size: 12px;
+        font-family: Theme.mono;
+        vertical-alignment: center;
+    }
+}
+
+// Download / upload speed over the last minute, plus latency, sessions and total traffic.
+component LiveCard inherits Card {
+    VerticalLayout {
+        padding: 18px;
+        padding-left: 20px;
+        padding-right: 20px;
+        spacing: 14px;
+        HorizontalLayout {
+            spacing: 10px;
+            Eyebrow {
+                text: @tr("Live traffic");
+                height: 20px;
+                horizontal-stretch: 1;
+            }
+            Beta { }
+        }
+        HorizontalLayout {
+            spacing: 26px;
+            Rate {
+                glyph: Icons.download;
+                label: @tr("Download");
+                value: AppState.tg-down;
+                tint: Theme.accent;
+            }
+            Rate {
+                glyph: Icons.upload;
+                label: @tr("Upload");
+                value: AppState.tg-up;
+                tint: Theme.amber;
+            }
+            Rectangle { horizontal-stretch: 1; }
+            Text {
+                text: AppState.tg-peak;
+                color: Theme.dim;
+                font-size: 11px;
+                vertical-alignment: bottom;
+            }
+        }
+        Rectangle {
+            height: 86px;
+            border-radius: 10px;
+            background: Theme.bg;
+            border-width: 1px;
+            border-color: Theme.border;
+            clip: true;
+            HorizontalLayout {
+                padding: 8px;
+                spacing: 2px;
+                for p in AppState.tg-graph: Rectangle {
+                    horizontal-stretch: 1;
+                    min-width: 1px;
+                    Rectangle {
+                        width: parent.width;
+                        height: p.down > 0 ? max(2px, parent.height * p.down) : 1px;
+                        y: parent.height - self.height;
+                        border-radius: 1.5px;
+                        background: p.down > 0 ? Theme.accent.with-alpha(0.85) : Theme.border;
+                    }
+                    if p.up > 0: Rectangle {
+                        width: parent.width * 0.5;
+                        x: parent.width * 0.25;
+                        height: max(2px, parent.height * p.up);
+                        y: parent.height - self.height;
+                        border-radius: 1px;
+                        background: Theme.amber;
+                    }
+                }
+            }
+            if !AppState.tg-running: Text {
+                width: parent.width;
+                height: parent.height;
+                text: @tr("Start the proxy to see live traffic.");
+                color: Theme.dim;
+                font-size: 12px;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+        HorizontalLayout {
+            spacing: 18px;
+            MiniStat {
+                label: @tr("Latency");
+                value: AppState.tg-latency;
+                value-color: AppState.tg-running ? Theme.success : Theme.muted;
+            }
+            MiniStat {
+                label: @tr("Sessions");
+                value: AppState.tg-sessions;
+            }
+            MiniStat {
+                label: @tr("Traffic");
+                value: AppState.tg-traffic;
+            }
+            Rectangle { horizontal-stretch: 1; }
+        }
+        Rectangle {
+            height: 1px;
+            background: Theme.border.with-alpha(0.7);
+        }
+        // speed cap for all Telegram traffic, applied immediately
+        HorizontalLayout {
+            spacing: 10px;
+            Text {
+                text: @tr("Speed limit");
+                color: Theme.muted;
+                font-size: 12px;
+                vertical-alignment: center;
+            }
+            Field {
+                width: 70px;
+                height: 32px;
+                mono: true;
+                text <=> AppState.tg-limit-text;
+                read-only: AppState.tg-unlimited;
+                opacity: AppState.tg-unlimited ? 0.45 : 1;
+                edited => { AppState.tg-limit-changed(); }
+            }
+            Text {
+                text: "MB/s";
+                color: Theme.dim;
+                font-size: 12px;
+                vertical-alignment: center;
+            }
+            Rectangle { horizontal-stretch: 1; }
+            Text {
+                text: @tr("Unlimited");
+                color: AppState.tg-unlimited ? Theme.text : Theme.muted;
+                font-size: 12px;
+                vertical-alignment: center;
+            }
+            VerticalLayout {
+                alignment: center;
+                Toggle {
+                    width: 40px;
+                    height: 24px;
+                    checked: AppState.tg-unlimited;
+                    toggled(v) => {
+                        AppState.tg-unlimited = v;
+                        AppState.tg-limit-changed();
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Open connections grouped by data center and route, with their current speed.
+component RoutesCard inherits Card {
+    VerticalLayout {
+        padding: 18px;
+        padding-left: 20px;
+        padding-right: 20px;
+        spacing: 6px;
+        HorizontalLayout {
+            spacing: 10px;
+            padding-bottom: 4px;
+            Eyebrow {
+                text: @tr("Connections");
+                height: 20px;
+                horizontal-stretch: 1;
+            }
+            Beta { }
+        }
+        if AppState.tg-routes.length == 0: Text {
+            text: AppState.tg-running ? @tr("No open connections yet. Open Telegram to see them here.") : @tr("The proxy is stopped.");
+            color: Theme.dim;
+            font-size: 12px;
+            wrap: word-wrap;
+        }
+        for r in AppState.tg-routes: Rectangle {
+            height: 36px;
+            border-radius: 9px;
+            background: Theme.bg.with-alpha(0.5);
+            // share of the total download speed
+            Rectangle {
+                x: 0;
+                width: parent.width * r.share;
+                height: parent.height;
+                border-radius: 9px;
+                background: (r.kind == 5 ? Theme.amber : Theme.accent).with-alpha(0.10);
+                animate width { duration: 400ms; easing: ease-out; }
+            }
+            HorizontalLayout {
+                padding-left: 12px;
+                padding-right: 12px;
+                spacing: 8px;
+                // "DC5 media · 4": takes what is left and elides first
+                Text {
+                    horizontal-stretch: 1;
+                    min-width: 40px;
+                    text: r.dc;
+                    color: Theme.text;
+                    font-size: 12.5px;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+                VerticalLayout {
+                    alignment: center;
+                    Pill {
+                        height: 22px;
+                        text: r.route;
+                        tone: r.kind == 5 ? 2 : r.kind == 1 ? 1 : r.kind == 4 ? 3 : r.kind == 0 ? 0 : 4;
+                    }
+                }
+                Text {
+                    width: 80px;
+                    text: "↓ " + r.down;
+                    color: Theme.text;
+                    font-size: 11px;
+                    font-family: Theme.mono;
+                    horizontal-alignment: right;
+                    vertical-alignment: center;
+                }
+                Text {
+                    width: 72px;
+                    text: "↑ " + r.up;
+                    color: Theme.muted;
+                    font-size: 11px;
+                    font-family: Theme.mono;
+                    horizontal-alignment: right;
+                    vertical-alignment: center;
+                }
+            }
+        }
+    }
+}
+
+component ErrorCard inherits Card {
+    height: 56px;
+    background: Theme.danger.with-alpha(0.10);
+    border-color: Theme.danger.with-alpha(0.5);
+    HorizontalLayout {
+        padding: 16px;
+        spacing: 10px;
+        Icon {
+            source: Icons.alert;
+            color: Theme.danger;
+            y: (parent.height - self.height) / 2;
+        }
+        Text {
+            horizontal-stretch: 1;
+            text: AppState.tg-error;
+            color: Theme.danger;
+            font-size: 12px;
+            wrap: word-wrap;
+            vertical-alignment: center;
+        }
+    }
+}
+
+// The secret is 32 hex characters; the regenerate button lives inside the field so the
+// text gets the full width.
+component SecretField inherits Rectangle {
+    height: 40px;
+    border-radius: Theme.r-input;
+    background: Theme.bg;
+    border-width: 1px;
+    border-color: ti.has-focus ? Theme.accent : Theme.border;
+    animate border-color { duration: 120ms; }
+    ti := TextInput {
+        x: 11px;
+        width: parent.width - 11px - 44px;
+        height: parent.height;
+        vertical-alignment: center;
+        text <=> AppState.tg-secret;
+        font-family: Theme.mono;
+        font-size: 11px;
+        font-weight: 500;
+        color: Theme.text;
+        single-line: true;
+        selection-background-color: Theme.accent.with-alpha(0.4);
+    }
+    Rectangle {
+        x: parent.width - 38px;
+        y: 5px;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: rg.has-hover ? Theme.surface2 : transparent;
+        Icon {
+            source: Icons.refresh;
+            color: Theme.accent;
+            size: 16px;
+            x: 7px;
+            y: 7px;
+        }
+        rg := TouchArea {
+            mouse-cursor: pointer;
+            clicked => { AppState.tg-regen-secret(); }
+        }
+    }
+}
+
+component ConnCard inherits Card {
+    height: 184px;
+    VerticalLayout {
+        padding: 18px;
+        padding-left: 20px;
+        padding-right: 20px;
+        spacing: 10px;
+        Eyebrow {
+            text: @tr("MTProto connection");
+            height: 20px;
+        }
+        HorizontalLayout {
+            spacing: 12px;
+            VerticalLayout {
+                horizontal-stretch: 3;
+                spacing: 6px;
+                Label { text: @tr("IP address"); }
+                Field {
+                    text <=> AppState.tg-host;
+                    mono: true;
+                }
+            }
+            VerticalLayout {
+                horizontal-stretch: 2;
+                spacing: 6px;
+                Label { text: @tr("Port"); }
+                Field {
+                    text <=> AppState.tg-port;
+                    mono: true;
+                }
+            }
+        }
+        VerticalLayout {
+            spacing: 6px;
+            Label { text: @tr("Secret"); }
+            SecretField { }
+        }
+    }
+}
+
+component DcCard inherits Card {
+    height: 170px;
+    VerticalLayout {
+        padding: 18px;
+        padding-left: 20px;
+        padding-right: 20px;
+        spacing: 8px;
+        Eyebrow {
+            text: @tr("Telegram data centers");
+            height: 20px;
+        }
+        Label {
+            text: @tr("One rule per line, format: number:IP");
+            color: Theme.dim;
+            font-size: 11.5px;
+        }
+        Area {
+            vertical-stretch: 1;
+            text <=> AppState.tg-dc-rules;
+        }
+    }
+}
+
+component CfCard inherits Card {
+    VerticalLayout {
+        padding: 18px;
+        padding-left: 20px;
+        padding-right: 20px;
+        spacing: 12px;
+        Eyebrow {
+            text: @tr("Cloudflare proxy");
+            height: 20px;
+        }
+        HorizontalLayout {
+            spacing: 10px;
+            CheckBox {
+                horizontal-stretch: 1;
+                label: @tr("Enable CF proxy");
+                check-icon: Icons.check;
+                checked <=> AppState.tg-cf;
+            }
+            Btn {
+                kind: 1;
+                height: 32px;
+                pad: 12px;
+                text: AppState.tg-cf-testing ? @tr("Testing…") : @tr("Test");
+                icon: Icons.activity;
+                enabled: !AppState.tg-cf-testing;
+                clicked => { AppState.tg-test-cf(); }
+            }
+        }
+        CheckBox {
+            label: @tr("Fall back to direct");
+            check-icon: Icons.check;
+            checked <=> AppState.tg-tcp-fallback;
+        }
+        Rectangle {
+            height: 1px;
+            background: Theme.border.with-alpha(0.7);
+        }
+        HorizontalLayout {
+            spacing: 10px;
+            CheckBox {
+                horizontal-stretch: 1;
+                label: @tr("Media booster (HTTP/2)");
+                check-icon: Icons.check;
+                checked <=> AppState.tg-h2;
+            }
+            VerticalLayout {
+                alignment: center;
+                Beta { }
+            }
+        }
+        Text {
+            text: @tr("Photos, videos and files on the Cloudflare route share fast HTTP/2 connections and download in parallel. Takes effect after Save.");
+            color: Theme.dim;
+            font-size: 11.5px;
+            wrap: word-wrap;
+        }
+    }
+}
+
+component SaveRow inherits HorizontalLayout {
+    spacing: 12px;
+    height: 46px;
+    Btn {
+        horizontal-stretch: 1;
+        text: @tr("Save");
+        height: 46px;
+        clicked => { AppState.tg-save(); }
+    }
+    Btn {
+        horizontal-stretch: 1;
+        kind: 1;
+        text: @tr("Cancel");
+        height: 46px;
+        clicked => { AppState.tg-cancel(); }
+    }
+}
+
+export component TelegramPage inherits Rectangle {
+    // two columns when there is room, one scrolling column otherwise
+    property <bool> wide: root.width >= 860px;
+
+    VerticalLayout {
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-top: 22px;
+        padding-bottom: 20px;
+        spacing: 18px;
+
+        PageHeader {
+            title: @tr("Telegram Proxy");
+            subtitle: @tr("Local MTProto proxy that reaches Telegram over WebSocket.");
+        }
+
+        // one scroll area for both layouts: at the minimum window size (or with the
+        // administrator banner shown) the right-hand column is taller than the page
+        sc := Scroller {
+            vertical-stretch: 1;
+            content-height: body.preferred-height + 8px;
+            body := VerticalLayout {
+                // pinned: inside the Flickable a layout would otherwise take its preferred width
+                width: sc.width;
+                padding-right: 10px;
+                alignment: start;
+
+                if root.wide: HorizontalLayout {
+                    spacing: 16px;
+                    // fixed 11:8 split: long (translated) labels must not push the columns apart
+                    VerticalLayout {
+                        horizontal-stretch: 0;
+                        width: (root.width - 48px - 10px - 16px) * 11 / 19;
+                        spacing: 14px;
+                        alignment: start;
+                        StatusCard { }
+                        if AppState.tg-error != "": ErrorCard { }
+                        LiveCard { }
+                        RoutesCard { }
+                        RouteCard { }
+                    }
+                    VerticalLayout {
+                        horizontal-stretch: 0;
+                        width: (root.width - 48px - 10px - 16px) * 8 / 19;
+                        spacing: 14px;
+                        alignment: start;
+                        ConnCard { }
+                        DcCard { }
+                        CfCard { }
+                        if AppState.tg-cf-result != "": Text {
+                            text: AppState.tg-cf-result;
+                            color: Theme.muted;
+                            font-size: 11.5px;
+                            wrap: word-wrap;
+                        }
+                        SaveRow { }
+                    }
+                }
+
+                if !root.wide: VerticalLayout {
+                    spacing: 14px;
+                    StatusCard { }
+                    if AppState.tg-error != "": ErrorCard { }
+                    LiveCard { }
+                    RoutesCard { }
+                    ConnCard { }
+                    RouteCard { }
+                    DcCard { }
+                    CfCard { }
+                    if AppState.tg-cf-result != "": Text {
+                        text: AppState.tg-cf-result;
+                        color: Theme.muted;
+                        font-size: 11.5px;
+                        wrap: word-wrap;
+                    }
+                    SaveRow { }
+                }
+            }
+        }
+    }
+}

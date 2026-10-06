@@ -1,0 +1,32 @@
+[package]
+name = "heli-tgproxy"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Local MTProto proxy that reaches Telegram over WebSocket (Rust port of Flowseal/tg-ws-proxy)"
+
+[dependencies]
+aes.workspace = true
+bytes.workspace = true
+cipher.workspace = true
+ctr.workspace = true
+futures-util.workspace = true
+h2.workspace = true
+http.workspace = true
+hex.workspace = true
+hmac.workspace = true
+rand.workspace = true
+rustls.workspace = true
+sha2.workspace = true
+subtle.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-rustls.workspace = true
+tokio-util.workspace = true
+tracing.workspace = true
+webpki-roots.workspace = true
+heli-core = { path = "../heli-core" }
+
+[dev-dependencies]
+serde_json.workspace = true

@@ -1,0 +1,303 @@
+import { Theme } from "../theme.slint";
+import { Card, Pill, Btn, Icon, Eyebrow, PageHeader } from "../components.slint";
+import { AppState } from "../state.slint";
+import { Icons } from "../icons.slint";
+
+component ServiceCard inherits Card {
+    in property <image> glyph;
+    in property <string> title;
+    in property <string> subtitle;
+    in property <bool> subtitle-mono: false;
+    in property <string> status;
+    in property <int> status-tone: 0;
+    in property <[string]> chips;
+    in property <string> primary-text;
+    in property <image> primary-icon;
+    in property <string> secondary-text;
+    in property <bool> primary-enabled: true;
+    callback primary();
+    callback secondary();
+    VerticalLayout {
+        padding: 20px;
+        spacing: 16px;
+        HorizontalLayout {
+            spacing: 14px;
+            Rectangle {
+                width: 48px;
+                height: 48px;
+                border-radius: 24px;
+                background: Theme.surface2;
+                border-width: 1.5px;
+                border-color: Theme.amber.with-alpha(0.65);
+                Icon {
+                    source: root.glyph;
+                    color: Theme.accent;
+                    size: 22px;
+                    x: 13px;
+                    y: 13px;
+                }
+            }
+            VerticalLayout {
+                horizontal-stretch: 1;
+                alignment: center;
+                spacing: 3px;
+                Text {
+                    text: root.title;
+                    color: Theme.text;
+                    font-size: 16px;
+                    font-weight: 600;
+                }
+                Text {
+                    text: root.subtitle;
+                    color: Theme.muted;
+                    font-size: 12px;
+                    font-family: root.subtitle-mono ? Theme.mono : Theme.sans;
+                    overflow: elide;
+                }
+            }
+            VerticalLayout {
+                horizontal-stretch: 0;
+                alignment: start;
+                padding-top: 8px;
+                HorizontalLayout {
+                    alignment: end;
+                    Pill {
+                        text: root.status;
+                        tone: root.status-tone;
+                    }
+                }
+            }
+        }
+        HorizontalLayout {
+            spacing: 8px;
+            alignment: start;
+            height: 24px;
+            for chip in root.chips: Pill {
+                text: chip;
+                tone: 5;
+            }
+        }
+        HorizontalLayout {
+            spacing: 10px;
+            Btn {
+                horizontal-stretch: 1;
+                text: root.primary-text;
+                icon: root.primary-icon;
+                enabled: root.primary-enabled;
+                clicked => { root.primary(); }
+            }
+            Btn {
+                kind: 1;
+                text: root.secondary-text;
+                clicked => { root.secondary(); }
+            }
+        }
+    }
+}
+
+export component OverviewPage inherits Rectangle {
+    VerticalLayout {
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-top: 22px;
+        padding-bottom: 22px;
+        spacing: 20px;
+
+        PageHeader {
+            title: @tr("Overview");
+            subtitle: @tr("Telegram proxy and the bypass in one place.");
+            Pill {
+                y: 8px;
+                text: AppState.protected ? @tr("Protected") : @tr("Not protected");
+                tone: AppState.protected ? 1 : 3;
+                height: 26px;
+            }
+            if AppState.protected: Btn {
+                kind: 2;
+                text: @tr("Stop all");
+                icon: Icons.x;
+                clicked => { AppState.toggle-all(); }
+            }
+            if !AppState.protected: Btn {
+                text: @tr("Start all");
+                icon: Icons.play;
+                clicked => { AppState.toggle-all(); }
+            }
+        }
+
+        if AppState.bp-error != "": Card {
+            height: 52px;
+            background: Theme.danger.with-alpha(0.10);
+            border-color: Theme.danger.with-alpha(0.5);
+            HorizontalLayout {
+                padding-left: 16px;
+                padding-right: 16px;
+                spacing: 10px;
+                Icon {
+                    source: Icons.alert;
+                    color: Theme.danger;
+                    y: (parent.height - self.height) / 2;
+                }
+                Text {
+                    horizontal-stretch: 1;
+                    text: AppState.bp-error;
+                    color: Theme.danger;
+                    font-size: 12px;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 16px;
+            ServiceCard {
+                glyph: Icons.send;
+                title: @tr("Telegram proxy");
+                subtitle: AppState.tg-addr;
+                subtitle-mono: true;
+                status: AppState.tg-busy ? @tr("Starting…") : AppState.tg-running ? @tr("Running") : @tr("Stopped");
+                status-tone: AppState.tg-busy ? 2 : AppState.tg-running ? 1 : 0;
+                chips: AppState.tg-running ? [AppState.tg-route, AppState.tg-dcs, AppState.tg-latency] : [AppState.tg-dcs];
+                primary-text: AppState.tg-running ? @tr("Open in Telegram") : @tr("Start proxy");
+                primary-icon: AppState.tg-running ? Icons.send : Icons.play;
+                secondary-text: @tr("Manage");
+                primary => {
+                    if (AppState.tg-running) {
+                        AppState.tg-open();
+                    } else {
+                        AppState.tg-toggle();
+                    }
+                }
+                secondary => { AppState.page = 1; }
+            }
+            ServiceCard {
+                glyph: Icons.shield;
+                title: @tr("Bypass");
+                subtitle: AppState.bp-strategy;
+                status: AppState.bp-state == 1 ? @tr("Starting…") : AppState.bp-state == 2 ? @tr("Running") : AppState.bp-state == 3 ? @tr("Failed") : @tr("Stopped");
+                status-tone: AppState.bp-state == 1 ? 2 : AppState.bp-state == 2 ? 1 : AppState.bp-state == 3 ? 3 : 0;
+                chips: AppState.bp-chips;
+                primary-text: AppState.bp-state == 2 ? @tr("Run tests") : @tr("Start bypass");
+                primary-icon: AppState.bp-state == 2 ? Icons.flask : Icons.play;
+                secondary-text: @tr("Strategies");
+                primary => {
+                    if (AppState.bp-state == 2) {
+                        AppState.page = 3;
+                    } else {
+                        AppState.bp-toggle();
+                    }
+                }
+                secondary => { AppState.page = 2; }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 16px;
+            vertical-stretch: 1;
+            Card {
+                horizontal-stretch: 1;
+                VerticalLayout {
+                    padding: 20px;
+                    padding-bottom: 8px;
+                    spacing: 6px;
+                    Eyebrow {
+                        text: @tr("Connection health");
+                        height: 22px;
+                    }
+                    for row[i] in AppState.health: VerticalLayout {
+                        if i > 0: Rectangle {
+                            height: 1px;
+                            background: Theme.border;
+                        }
+                        HorizontalLayout {
+                            height: 46px;
+                            spacing: 12px;
+                            Text {
+                                text: row.name;
+                                color: Theme.text;
+                                font-size: 13px;
+                                font-weight: 500;
+                                vertical-alignment: center;
+                                horizontal-stretch: 1;
+                            }
+                            Text {
+                                text: row.ms;
+                                color: Theme.muted;
+                                font-size: 12px;
+                                font-family: Theme.mono;
+                                vertical-alignment: center;
+                            }
+                            VerticalLayout {
+                                alignment: center;
+                                Pill {
+                                    text: row.ok ? @tr("OK") : @tr("Blocked");
+                                    tone: row.ok ? 1 : 3;
+                                    width: 52px;
+                                    dot: false;
+                                }
+                            }
+                        }
+                    }
+                    Rectangle { vertical-stretch: 1; }
+                }
+            }
+            Card {
+                horizontal-stretch: 1;
+                VerticalLayout {
+                    padding: 20px;
+                    spacing: 14px;
+                    Eyebrow {
+                        text: @tr("Activity");
+                        height: 22px;
+                    }
+                    Rectangle {
+                        vertical-stretch: 1;
+                        border-radius: 12px;
+                        background: Theme.bg;
+                        border-width: 1px;
+                        border-color: Theme.border;
+                        clip: true;
+                        VerticalLayout {
+                            padding: 14px;
+                            spacing: 8px;
+                            alignment: start;
+                            for e in AppState.activity: HorizontalLayout {
+                                spacing: 12px;
+                                height: 16px;
+                                Text {
+                                    width: 58px;
+                                    text: e.time;
+                                    color: Theme.dim;
+                                    font-size: 11px;
+                                    font-family: Theme.mono;
+                                }
+                                Text {
+                                    width: 54px;
+                                    text: e.source;
+                                    color: e.level == 2 ? Theme.danger : e.level == 1 ? Theme.amber : Theme.muted;
+                                    font-size: 11px;
+                                    font-family: Theme.mono;
+                                }
+                                Text {
+                                    horizontal-stretch: 1;
+                                    text: e.message;
+                                    color: e.level == 2 ? Theme.danger : Theme.text;
+                                    font-size: 11px;
+                                    font-family: Theme.mono;
+                                    overflow: elide;
+                                }
+                            }
+                            if AppState.activity.length == 0: Text {
+                                text: @tr("No activity yet.");
+                                color: Theme.dim;
+                                font-size: 11px;
+                                font-family: Theme.mono;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
